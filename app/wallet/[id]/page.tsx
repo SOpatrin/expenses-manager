@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { requireUserId } from '@/lib/auth'
@@ -25,7 +26,14 @@ export default async function WalletPage({
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <Link
+          href="/wallets"
+          className="shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+          aria-label="Все кошельки"
+        >
+          ←
+        </Link>
         <WalletNameEditor walletId={id} initialName={wallet.name} />
         <form action={signOutAction}>
           <button

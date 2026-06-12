@@ -35,6 +35,17 @@ export async function getWallet(
   return row?.wallet ?? null
 }
 
+export async function getWallets(userId: string): Promise<Wallet[]> {
+  const rows = await db
+    .select({ wallet: wallets })
+    .from(walletMembers)
+    .innerJoin(wallets, eq(walletMembers.walletId, wallets.id))
+    .where(eq(walletMembers.userId, userId))
+    .orderBy(wallets.createdAt)
+
+  return rows.map((r) => r.wallet)
+}
+
 export async function renameWallet(
   userId: string,
   walletId: string,
