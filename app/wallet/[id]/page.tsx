@@ -1,7 +1,11 @@
+import { notFound } from 'next/navigation'
+
 import { requireUserId } from '@/lib/auth'
 import { getTransactions } from '@/lib/transactions'
+import { getWallet } from '@/lib/wallets'
 
 import { signOutAction } from './actions'
+import { WalletNameEditor } from './_components/WalletNameEditor'
 import WalletView from './_components/WalletView'
 
 export default async function WalletPage({
@@ -12,14 +16,17 @@ export default async function WalletPage({
   const userId = await requireUserId()
 
   const { id } = await params
-  const transactions = await getTransactions(userId, id)
+  const [wallet, transactions] = await Promise.all([
+    getWallet(userId, id),
+    getTransactions(userId, id),
+  ])
+
+  if (!wallet) notFound()
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
-          Кошелёк
-        </h1>
+        <WalletNameEditor walletId={id} initialName={wallet.name} />
         <form action={signOutAction}>
           <button
             type="submit"
