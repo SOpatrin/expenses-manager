@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 
-import { signInWithCredentials, signInWithGoogle } from './actions'
+import { signInWithGoogle } from './actions'
 import { LoginForm } from './_components/LoginForm'
 
 function GoogleIcon() {
@@ -51,7 +51,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <LoginForm action={signInWithCredentials} />
+        <LoginForm />
       </div>
     </div>
   )
