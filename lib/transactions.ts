@@ -58,6 +58,28 @@ export async function getTransactions(
     .orderBy(desc(transactions.date), desc(transactions.createdAt))
 }
 
+export async function updateTransaction(
+  userId: string,
+  walletId: string,
+  transactionId: string,
+  data: Partial<NewTransaction>,
+): Promise<Transaction> {
+  await assertWalletAccess(userId, walletId)
+
+  const [transaction] = await db
+    .update(transactions)
+    .set({ ...data, updatedAt: new Date() })
+    .where(
+      and(
+        eq(transactions.id, transactionId),
+        eq(transactions.walletId, walletId),
+      ),
+    )
+    .returning()
+
+  return transaction
+}
+
 export async function deleteTransaction(
   userId: string,
   walletId: string,

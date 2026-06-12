@@ -3,7 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { DEV_USER_ID } from '@/app/_dev'
-import { createTransaction, deleteTransaction } from '@/lib/transactions'
+import {
+  createTransaction,
+  deleteTransaction,
+  updateTransaction,
+} from '@/lib/transactions'
 
 const schema = z.object({
   amount: z.coerce.number().positive(),
@@ -39,6 +43,25 @@ export async function addTransaction(
 
   revalidatePath(`/wallet/${walletId}`)
   return { status: 'success' }
+}
+
+export async function updateTransactionAction(
+  walletId: string,
+  transactionId: string,
+  formData: FormData,
+): Promise<void> {
+  const parsed = schema.safeParse({
+    amount: formData.get('amount'),
+    type: formData.get('type'),
+    category: formData.get('category') || undefined,
+    description: formData.get('description') || undefined,
+    date: formData.get('date'),
+  })
+
+  if (!parsed.success) return
+
+  await updateTransaction(DEV_USER_ID, walletId, transactionId, parsed.data)
+  revalidatePath(`/wallet/${walletId}`)
 }
 
 export async function deleteTransactionAction(
