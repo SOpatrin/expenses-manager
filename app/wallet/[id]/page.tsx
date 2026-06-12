@@ -8,6 +8,7 @@ import { getWallet } from '@/lib/wallets'
 import { signOutAction } from './actions'
 import { WalletNameEditor } from './_components/WalletNameEditor'
 import WalletView from './_components/WalletView'
+import { DeleteWalletButton } from '../../wallets/_components/DeleteWalletButton'
 
 export default async function WalletPage({
   params,
@@ -45,6 +46,9 @@ export default async function WalletPage({
         </form>
       </div>
       <WalletView walletId={id} initialTransactions={transactions} />
+      <div className="mt-16 flex justify-center">
+        <DeleteWalletButton walletId={id} />
+      </div>
     </main>
   )
 }

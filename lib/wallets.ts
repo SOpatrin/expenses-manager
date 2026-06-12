@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm'
 
 import { db } from './db'
-import { walletMembers, wallets } from './schema'
+import { transactions, walletMembers, wallets } from './schema'
 
 export type Wallet = typeof wallets.$inferSelect
 
@@ -55,6 +55,28 @@ export async function renameWallet(
   if (!wallet) throw new Error('Wallet not found or access denied')
 
   await db.update(wallets).set({ name }).where(eq(wallets.id, walletId))
+}
+
+export async function deleteWallet(
+  userId: string,
+  walletId: string,
+): Promise<void> {
+  const [member] = await db
+    .select()
+    .from(walletMembers)
+    .where(
+      and(
+        eq(walletMembers.walletId, walletId),
+        eq(walletMembers.userId, userId),
+      ),
+    )
+
+  if (!member || member.role !== 'owner')
+    throw new Error('Only owner can delete wallet')
+
+  await db.delete(transactions).where(eq(transactions.walletId, walletId))
+  await db.delete(walletMembers).where(eq(walletMembers.walletId, walletId))
+  await db.delete(wallets).where(eq(wallets.id, walletId))
 }
 
 export async function createWallet(
