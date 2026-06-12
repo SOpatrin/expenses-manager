@@ -1,7 +1,14 @@
 import { and, eq } from 'drizzle-orm'
 
 import { db } from './db'
-import { transactions, walletMembers, wallets } from './schema'
+import { transactions, users, walletMembers, wallets } from './schema'
+
+export type WalletMember = {
+  userId: string
+  role: 'owner' | 'member'
+  name: string | null
+  email: string | null
+}
 
 export type Wallet = typeof wallets.$inferSelect
 
@@ -88,4 +95,64 @@ export async function createWallet(
     .insert(walletMembers)
     .values({ walletId: wallet.id, userId, role: 'owner' })
   return wallet
+}
+
+export async function getWalletMembers(
+  userId: string,
+  walletId: string,
+): Promise<WalletMember[]> {
+  const access = await getWallet(userId, walletId)
+  if (!access) throw new Error('Access denied')
+
+  return db
+    .select({
+      userId: walletMembers.userId,
+      role: walletMembers.role,
+      name: users.name,
+      email: users.email,
+    })
+    .from(walletMembers)
+    .innerJoin(users, eq(walletMembers.userId, users.id))
+    .where(eq(walletMembers.walletId, walletId))
+}
+
+export async function addWalletMember(
+  walletId: string,
+  userId: string,
+): Promise<void> {
+  await db
+    .insert(walletMembers)
+    .values({ walletId, userId, role: 'member' })
+    .onConflictDoNothing()
+}
+
+export async function removeWalletMember(
+  ownerUserId: string,
+  walletId: string,
+  targetUserId: string,
+): Promise<void> {
+  const [member] = await db
+    .select()
+    .from(walletMembers)
+    .where(
+      and(
+        eq(walletMembers.walletId, walletId),
+        eq(walletMembers.userId, ownerUserId),
+      ),
+    )
+
+  if (!member || member.role !== 'owner')
+    throw new Error('Only owner can remove members')
+
+  if (targetUserId === ownerUserId)
+    throw new Error('Owner cannot remove themselves')
+
+  await db
+    .delete(walletMembers)
+    .where(
+      and(
+        eq(walletMembers.walletId, walletId),
+        eq(walletMembers.userId, targetUserId),
+      ),
+    )
 }
