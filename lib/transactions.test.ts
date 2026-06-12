@@ -76,9 +76,9 @@ describe('transactions', () => {
     })
 
     it('бросает ошибку если userId не имеет доступа к кошельку', async () => {
-      await expect(
-        getTransactions('stranger', walletId),
-      ).rejects.toThrow('Access denied')
+      await expect(getTransactions('stranger', walletId)).rejects.toThrow(
+        'Access denied',
+      )
     })
   })
 })
