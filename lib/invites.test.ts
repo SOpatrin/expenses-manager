@@ -10,7 +10,7 @@ import {
   revokeInvite,
 } from './invites'
 import { users, walletInvites, wallets } from './schema'
-import { createWallet } from './wallets'
+import { addWalletMember, createWallet } from './wallets'
 
 const TEST_OWNER_ID = 'test-owner-invites'
 const TEST_GUEST_ID = 'test-guest-invites'
@@ -47,6 +47,13 @@ describe('createInvite', () => {
   it('бросает ошибку если юзер не участник кошелька', async () => {
     await expect(createInvite('stranger', walletId)).rejects.toThrow(
       'Access denied',
+    )
+  })
+
+  it('бросает ошибку если юзер — гость, а не owner', async () => {
+    await addWalletMember(walletId, TEST_GUEST_ID)
+    await expect(createInvite(TEST_GUEST_ID, walletId)).rejects.toThrow(
+      'Only owner can manage invites',
     )
   })
 
@@ -146,6 +153,14 @@ describe('revokeInvite', () => {
     const token = await createInvite(TEST_OWNER_ID, walletId)
     await expect(revokeInvite('stranger', token)).rejects.toThrow(
       'Access denied',
+    )
+  })
+
+  it('бросает ошибку если юзер — гость, а не owner', async () => {
+    const token = await createInvite(TEST_OWNER_ID, walletId)
+    await addWalletMember(walletId, TEST_GUEST_ID)
+    await expect(revokeInvite(TEST_GUEST_ID, token)).rejects.toThrow(
+      'Only owner can manage invites',
     )
   })
 
