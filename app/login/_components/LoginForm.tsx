@@ -1,39 +1,17 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useActionState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-export function LoginForm() {
-  const [error, setError] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
-  const router = useRouter()
+import { loginWithCredentials } from '../actions'
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const data = new FormData(e.currentTarget)
-    const callbackUrl =
-      new URLSearchParams(window.location.search).get('callbackUrl') || '/'
-    startTransition(async () => {
-      const result = await signIn('credentials', {
-        email: data.get('email'),
-        password: data.get('password'),
-        redirect: false,
-        callbackUrl,
-      })
-      if (result?.error) {
-        setError('Неверный email или пароль')
-      } else {
-        router.push(callbackUrl)
-      }
-    })
-  }
+export function LoginForm() {
+  const [error, action, isPending] = useActionState(loginWithCredentials, null)
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form action={action} method="post" className="space-y-3">
       <Input
         name="email"
         type="email"
