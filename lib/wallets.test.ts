@@ -7,6 +7,7 @@ import {
   createWallet,
   getFirstWallet,
   getWallet,
+  getWallets,
   renameWallet,
 } from './wallets'
 
@@ -49,6 +50,21 @@ describe('getWallet', () => {
     const wallet = await createWallet(TEST_USER_ID, 'Мой')
     const result = await getWallet(TEST_USER_ID, wallet.id)
     expect(result?.id).toBe(wallet.id)
+  })
+})
+
+describe('getWallets', () => {
+  it('возвращает пустой массив если кошельков нет', async () => {
+    const result = await getWallets(TEST_USER_ID)
+    expect(result).toEqual([])
+  })
+
+  it('возвращает все кошельки юзера', async () => {
+    await createWallet(TEST_USER_ID, 'А')
+    await createWallet(TEST_USER_ID, 'Б')
+    const result = await getWallets(TEST_USER_ID)
+    expect(result).toHaveLength(2)
+    expect(result.map((w) => w.name)).toEqual(['А', 'Б'])
   })
 })
 
