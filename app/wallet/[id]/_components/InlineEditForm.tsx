@@ -30,6 +30,16 @@ export function InlineEditForm({
           required
           className="w-full py-1.5"
         />
+        <NativeSelect
+          name="currency"
+          defaultValue={t.currency}
+          className="py-1.5"
+        >
+          <option value="RSD">RSD</option>
+          <option value="RUB">RUB</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </NativeSelect>
         <NativeSelect name="type" defaultValue={t.type} className="py-1.5">
           <option value="expense">Расход</option>
           <option value="income">Доход</option>

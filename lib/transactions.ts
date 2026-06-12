@@ -4,6 +4,7 @@ import { transactions, walletMembers } from './schema'
 
 export type NewTransaction = {
   amount: number
+  currency: string
   type: 'income' | 'expense'
   category?: string
   description?: string

@@ -3,9 +3,18 @@ import { SwipeableRow } from '@/components/ui/swipeable-row'
 import type { Transaction } from '@/lib/transactions'
 import { InlineEditForm } from './InlineEditForm'
 
-function formatAmount(amount: number, type: Transaction['type']) {
+function formatAmount(
+  amount: number,
+  type: Transaction['type'],
+  currency: string,
+) {
   const sign = type === 'income' ? '+' : '−'
-  return `${sign} ${amount.toLocaleString('ru-RU')} ₽`
+  const formatted = new Intl.NumberFormat('ru-RU', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(amount)
+  return `${sign} ${formatted}`
 }
 
 export default function TransactionList({
@@ -69,7 +78,7 @@ export default function TransactionList({
                         : 'text-sm font-semibold text-red-500'
                     }
                   >
-                    {formatAmount(t.amount, t.type)}
+                    {formatAmount(t.amount, t.type, t.currency)}
                   </span>
                   <button
                     onClick={(e) => {

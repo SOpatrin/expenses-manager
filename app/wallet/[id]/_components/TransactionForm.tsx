@@ -36,6 +36,12 @@ export default function TransactionForm({
           required
           className="w-full"
         />
+        <NativeSelect name="currency" defaultValue="RSD">
+          <option value="RSD">RSD</option>
+          <option value="RUB">RUB</option>
+          <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
+        </NativeSelect>
         <NativeSelect name="type" defaultValue="expense">
           <option value="expense">Расход</option>
           <option value="income">Доход</option>
