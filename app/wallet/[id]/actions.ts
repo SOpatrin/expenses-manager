@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { DEV_USER_ID } from '@/app/_dev'
-import { createTransaction } from '@/lib/transactions'
+import { createTransaction, deleteTransaction } from '@/lib/transactions'
 
 const schema = z.object({
   amount: z.coerce.number().positive(),
@@ -39,4 +39,12 @@ export async function addTransaction(
 
   revalidatePath(`/wallet/${walletId}`)
   return { status: 'success' }
+}
+
+export async function deleteTransactionAction(
+  walletId: string,
+  transactionId: string,
+): Promise<void> {
+  await deleteTransaction(DEV_USER_ID, walletId, transactionId)
+  revalidatePath(`/wallet/${walletId}`)
 }

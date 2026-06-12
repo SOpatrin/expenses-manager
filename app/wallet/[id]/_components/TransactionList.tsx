@@ -7,8 +7,12 @@ function formatAmount(amount: number, type: Transaction['type']) {
 
 export default function TransactionList({
   transactions,
+  onDelete,
+  isDeleting,
 }: {
   transactions: Transaction[]
+  onDelete: (id: string) => void
+  isDeleting: boolean
 }) {
   if (transactions.length === 0) {
     return (
@@ -21,22 +25,32 @@ export default function TransactionList({
   return (
     <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
       {transactions.map((t) => (
-        <li key={t.id} className="flex items-center justify-between py-3">
+        <li key={t.id} className="group flex items-center justify-between py-3">
           <div className="flex flex-col gap-0.5">
             <span className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
               {t.category ?? 'Без категории'}
             </span>
             <span className="text-xs text-zinc-400">{t.date}</span>
           </div>
-          <span
-            className={
-              t.type === 'income'
-                ? 'text-sm font-semibold text-emerald-600'
-                : 'text-sm font-semibold text-red-500'
-            }
-          >
-            {formatAmount(t.amount, t.type)}
-          </span>
+          <div className="flex items-center gap-3">
+            <span
+              className={
+                t.type === 'income'
+                  ? 'text-sm font-semibold text-emerald-600'
+                  : 'text-sm font-semibold text-red-500'
+              }
+            >
+              {formatAmount(t.amount, t.type)}
+            </span>
+            <button
+              onClick={() => onDelete(t.id)}
+              disabled={isDeleting}
+              className="text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-400 disabled:pointer-events-none dark:text-zinc-600 dark:hover:text-red-400"
+              aria-label="Удалить"
+            >
+              ×
+            </button>
+          </div>
         </li>
       ))}
     </ul>
