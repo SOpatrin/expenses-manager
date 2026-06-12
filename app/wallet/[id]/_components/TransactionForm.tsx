@@ -31,7 +31,7 @@ export default function TransactionForm({
           name="amount"
           type="number"
           min="0.01"
-          step="1"
+          step="0.01"
           placeholder="Сумма"
           required
           className="w-full"
