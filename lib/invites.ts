@@ -2,7 +2,13 @@ import { and, eq, isNull } from 'drizzle-orm'
 
 import { db } from './db'
 import { users, walletInvites, wallets } from './schema'
-import { addWalletMember, getWallet } from './wallets'
+import { addWalletMember, getWallet, getWalletMembers } from './wallets'
+
+async function requireOwner(userId: string, walletId: string): Promise<void> {
+  const members = await getWalletMembers(userId, walletId)
+  const me = members.find((m) => m.userId === userId)
+  if (me?.role !== 'owner') throw new Error('Only owner can manage invites')
+}
 
 export type InviteInfo = {
   token: string
@@ -24,8 +30,7 @@ export async function createInvite(
   walletId: string,
   email?: string,
 ): Promise<string> {
-  const wallet = await getWallet(userId, walletId)
-  if (!wallet) throw new Error('Access denied')
+  await requireOwner(userId, walletId)
 
   const [invite] = await db
     .insert(walletInvites)
@@ -100,8 +105,7 @@ export async function revokeInvite(
   const invite = await getInvite(token)
   if (!invite) throw new Error('Invite not found')
 
-  const wallet = await getWallet(userId, invite.walletId)
-  if (!wallet) throw new Error('Access denied')
+  await requireOwner(userId, invite.walletId)
 
   await db.delete(walletInvites).where(eq(walletInvites.token, token))
 }

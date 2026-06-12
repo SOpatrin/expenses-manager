@@ -9,12 +9,16 @@ import type { PendingInvite } from '@/lib/invites'
 export function InviteSection({
   walletId,
   pendingInvites,
+  isOwner,
 }: {
   walletId: string
   pendingInvites: PendingInvite[]
+  isOwner: boolean
 }) {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+
+  if (!isOwner) return null
 
   function handleCreate() {
     startTransition(async () => {

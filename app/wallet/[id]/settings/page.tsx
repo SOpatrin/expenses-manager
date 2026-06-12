@@ -73,7 +73,7 @@ export default async function WalletSettingsPage({
         ))}
       </ul>
 
-      <InviteSection walletId={id} pendingInvites={invites} />
+      <InviteSection walletId={id} pendingInvites={invites} isOwner={isOwner} />
     </main>
   )
 }
