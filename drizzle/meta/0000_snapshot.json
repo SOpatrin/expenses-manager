@@ -42,12 +42,8 @@
           "name": "account_members_account_id_accounts_id_fk",
           "tableFrom": "account_members",
           "tableTo": "accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -55,10 +51,7 @@
       "compositePrimaryKeys": {
         "account_members_account_id_user_id_pk": {
           "name": "account_members_account_id_user_id_pk",
-          "columns": [
-            "account_id",
-            "user_id"
-          ]
+          "columns": ["account_id", "user_id"]
         }
       },
       "uniqueConstraints": {},
@@ -181,12 +174,8 @@
           "name": "transactions_account_id_accounts_id_fk",
           "tableFrom": "transactions",
           "tableTo": "accounts",
-          "columnsFrom": [
-            "account_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["account_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -202,18 +191,12 @@
     "public.member_role": {
       "name": "member_role",
       "schema": "public",
-      "values": [
-        "owner",
-        "member"
-      ]
+      "values": ["owner", "member"]
     },
     "public.transaction_type": {
       "name": "transaction_type",
       "schema": "public",
-      "values": [
-        "income",
-        "expense"
-      ]
+      "values": ["income", "expense"]
     }
   },
   "schemas": {},

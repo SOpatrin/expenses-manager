@@ -22,7 +22,10 @@ const money = customType<{ data: number; driverData: number }>({
   },
 })
 
-export const transactionTypeEnum = pgEnum('transaction_type', ['income', 'expense'])
+export const transactionTypeEnum = pgEnum('transaction_type', [
+  'income',
+  'expense',
+])
 export const memberRoleEnum = pgEnum('member_role', ['owner', 'member'])
 
 export const accounts = pgTable('accounts', {
