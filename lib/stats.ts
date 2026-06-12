@@ -1,6 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm'
-import { db } from './db'
-import { transactions, walletMembers } from './schema'
+import type { Transaction } from './transactions'
 
 export type WalletStats = {
   income: number
@@ -8,42 +6,12 @@ export type WalletStats = {
   balance: number
 }
 
-async function assertWalletAccess(
-  userId: string,
-  walletId: string,
-): Promise<void> {
-  const [member] = await db
-    .select()
-    .from(walletMembers)
-    .where(
-      and(
-        eq(walletMembers.walletId, walletId),
-        eq(walletMembers.userId, userId),
-      ),
-    )
-    .limit(1)
-  if (!member) throw new Error('Access denied')
-}
-
-export async function getStats(
-  userId: string,
-  walletId: string,
-): Promise<WalletStats> {
-  await assertWalletAccess(userId, walletId)
-
-  const rows = await db
-    .select({
-      type: transactions.type,
-      total: sql<number>`coalesce(sum(${transactions.amount}), 0)`.mapWith(
-        transactions.amount,
-      ),
-    })
-    .from(transactions)
-    .where(eq(transactions.walletId, walletId))
-    .groupBy(transactions.type)
-
-  const income = rows.find((r) => r.type === 'income')?.total ?? 0
-  const expense = rows.find((r) => r.type === 'expense')?.total ?? 0
-
+export function computeStats(transactions: Transaction[]): WalletStats {
+  let income = 0
+  let expense = 0
+  for (const t of transactions) {
+    if (t.type === 'income') income += t.amount
+    else expense += t.amount
+  }
   return { income, expense, balance: income - expense }
 }

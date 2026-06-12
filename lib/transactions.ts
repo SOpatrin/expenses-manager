@@ -57,3 +57,20 @@ export async function getTransactions(
     .where(eq(transactions.walletId, walletId))
     .orderBy(desc(transactions.date), desc(transactions.createdAt))
 }
+
+export async function deleteTransaction(
+  userId: string,
+  walletId: string,
+  transactionId: string,
+): Promise<void> {
+  await assertWalletAccess(userId, walletId)
+
+  await db
+    .delete(transactions)
+    .where(
+      and(
+        eq(transactions.id, transactionId),
+        eq(transactions.walletId, walletId),
+      ),
+    )
+}

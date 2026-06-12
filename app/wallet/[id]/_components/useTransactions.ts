@@ -1,0 +1,72 @@
+'use client'
+
+import { useActionState, useOptimistic, useTransition } from 'react'
+import { DEV_USER_ID } from '@/app/_dev'
+import { computeStats } from '@/lib/stats'
+import type { Transaction } from '@/lib/transactions'
+import {
+  type AddTransactionState,
+  addTransaction,
+  deleteTransactionAction,
+} from '../actions'
+
+type OptimisticAction =
+  | { type: 'add'; formData: FormData }
+  | { type: 'delete'; id: string }
+
+export function useTransactions(
+  walletId: string,
+  initialTransactions: Transaction[],
+) {
+  const [isDeleting, startTransition] = useTransition()
+
+  const [optimisticTransactions, updateOptimistic] = useOptimistic(
+    initialTransactions,
+    (state: Transaction[], action: OptimisticAction) => {
+      if (action.type === 'delete') {
+        return state.filter((t) => t.id !== action.id)
+      }
+      const optimistic: Transaction = {
+        id: crypto.randomUUID(),
+        walletId,
+        createdBy: DEV_USER_ID,
+        amount: Number(action.formData.get('amount')),
+        currency: 'RUB',
+        type: action.formData.get('type') as Transaction['type'],
+        category: (action.formData.get('category') as string) || null,
+        description: (action.formData.get('description') as string) || null,
+        date: action.formData.get('date') as string,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+      return [optimistic, ...state]
+    },
+  )
+
+  const [addState, submitAdd, isAdding] = useActionState<
+    AddTransactionState,
+    FormData
+  >(addTransaction.bind(null, walletId), { status: 'idle' })
+
+  function handleSubmit(formData: FormData) {
+    updateOptimistic({ type: 'add', formData })
+    submitAdd(formData)
+  }
+
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      updateOptimistic({ type: 'delete', id })
+      await deleteTransactionAction(walletId, id)
+    })
+  }
+
+  return {
+    optimisticTransactions,
+    stats: computeStats(optimisticTransactions),
+    addState,
+    isAdding,
+    isDeleting,
+    handleSubmit,
+    handleDelete,
+  }
+}
