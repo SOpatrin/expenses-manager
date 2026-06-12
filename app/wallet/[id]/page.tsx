@@ -29,7 +29,7 @@ export default async function WalletPage({
       <div className="mb-6 flex items-center justify-between gap-3">
         <Link
           href="/wallets"
-          className="shrink-0 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+          className="shrink-0 text-zinc-400 hover:text-zinc-600 lg:hidden dark:hover:text-zinc-200"
           aria-label="Все кошельки"
         >
           ←
