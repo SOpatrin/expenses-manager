@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import type { Transaction } from '@/lib/transactions'
 
@@ -19,14 +21,14 @@ export function InlineEditForm({
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex gap-2">
-        <input
+        <Input
           name="amount"
           type="number"
           min="0.01"
           step="0.01"
           defaultValue={t.amount}
           required
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full py-1.5"
         />
         <NativeSelect name="type" defaultValue={t.type} className="py-1.5">
           <option value="expense">Расход</option>
@@ -34,37 +36,34 @@ export function InlineEditForm({
         </NativeSelect>
       </div>
       <div className="flex gap-2">
-        <input
+        <Input
           name="category"
           type="text"
           defaultValue={t.category ?? ''}
           placeholder="Категория"
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full py-1.5"
         />
-        <input
+        <Input
           name="date"
           type="date"
           defaultValue={t.date}
           required
-          className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
+          className="py-1.5"
         />
       </div>
       <div className="flex justify-end gap-2">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={onCancel}
           disabled={disabled}
-          className="rounded-md px-3 py-1.5 text-sm text-zinc-500 hover:bg-zinc-100 disabled:pointer-events-none dark:hover:bg-zinc-800"
         >
           Отмена
-        </button>
-        <button
-          type="submit"
-          disabled={disabled}
-          className="rounded-md bg-zinc-800 px-3 py-1.5 text-sm text-white hover:bg-zinc-700 disabled:pointer-events-none disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300"
-        >
+        </Button>
+        <Button type="submit" size="sm" disabled={disabled}>
           Сохранить
-        </button>
+        </Button>
       </div>
     </form>
   )

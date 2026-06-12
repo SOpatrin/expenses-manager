@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import type { AddTransactionState } from '../actions'
 
@@ -26,14 +27,14 @@ export default function TransactionForm({
   return (
     <form ref={formRef} action={handleAction} className="flex flex-col gap-3">
       <div className="flex gap-2">
-        <input
+        <Input
           name="amount"
           type="number"
           min="0.01"
           step="0.01"
           placeholder="Сумма"
           required
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full"
         />
         <NativeSelect name="type" defaultValue="expense">
           <option value="expense">Расход</option>
@@ -42,19 +43,13 @@ export default function TransactionForm({
       </div>
 
       <div className="flex gap-2">
-        <input
+        <Input
           name="category"
           type="text"
           placeholder="Категория"
-          className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
+          className="w-full"
         />
-        <input
-          name="date"
-          type="date"
-          defaultValue={today}
-          required
-          className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm outline-none focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900"
-        />
+        <Input name="date" type="date" defaultValue={today} required />
       </div>
 
       {addState.status === 'error' && (
