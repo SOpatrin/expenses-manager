@@ -55,5 +55,5 @@ export async function getTransactions(
     .select()
     .from(transactions)
     .where(eq(transactions.walletId, walletId))
-    .orderBy(desc(transactions.date))
+    .orderBy(desc(transactions.date), desc(transactions.createdAt))
 }
