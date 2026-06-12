@@ -36,14 +36,22 @@ export default async function WalletPage({
           ←
         </Link>
         <WalletNameEditor walletId={id} initialName={wallet.name} />
-        <form action={signOutAction}>
-          <button
-            type="submit"
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/wallet/${id}/settings`}
             className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
-            Выйти
-          </button>
-        </form>
+            Участники
+          </Link>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            >
+              Выйти
+            </button>
+          </form>
+        </div>
       </div>
       <WalletView walletId={id} initialTransactions={transactions} />
       <div className="mt-16 flex justify-center">
