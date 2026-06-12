@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
-import { DEV_USER_ID } from '@/app/_dev'
+
+import { requireUserId } from '@/lib/auth'
 import {
   createTransaction,
   deleteTransaction,
@@ -27,6 +28,8 @@ export async function addTransaction(
   prevState: AddTransactionState,
   formData: FormData,
 ): Promise<AddTransactionState> {
+  const userId = await requireUserId()
+
   const parsed = schema.safeParse({
     amount: formData.get('amount'),
     type: formData.get('type'),
@@ -39,7 +42,7 @@ export async function addTransaction(
     return { status: 'error', message: parsed.error.issues[0].message }
   }
 
-  await createTransaction(DEV_USER_ID, walletId, parsed.data)
+  await createTransaction(userId, walletId, parsed.data)
 
   revalidatePath(`/wallet/${walletId}`)
   return { status: 'success' }
@@ -50,6 +53,8 @@ export async function updateTransactionAction(
   transactionId: string,
   formData: FormData,
 ): Promise<void> {
+  const userId = await requireUserId()
+
   const parsed = schema.safeParse({
     amount: formData.get('amount'),
     type: formData.get('type'),
@@ -60,7 +65,7 @@ export async function updateTransactionAction(
 
   if (!parsed.success) return
 
-  await updateTransaction(DEV_USER_ID, walletId, transactionId, parsed.data)
+  await updateTransaction(userId, walletId, transactionId, parsed.data)
   revalidatePath(`/wallet/${walletId}`)
 }
 
@@ -68,6 +73,8 @@ export async function deleteTransactionAction(
   walletId: string,
   transactionId: string,
 ): Promise<void> {
-  await deleteTransaction(DEV_USER_ID, walletId, transactionId)
+  const userId = await requireUserId()
+
+  await deleteTransaction(userId, walletId, transactionId)
   revalidatePath(`/wallet/${walletId}`)
 }

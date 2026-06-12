@@ -1,5 +1,6 @@
-import { DEV_USER_ID } from '@/app/_dev'
+import { requireUserId } from '@/lib/auth'
 import { getTransactions } from '@/lib/transactions'
+
 import WalletView from './_components/WalletView'
 
 export default async function WalletPage({
@@ -7,8 +8,10 @@ export default async function WalletPage({
 }: {
   params: Promise<{ id: string }>
 }) {
+  const userId = await requireUserId()
+
   const { id } = await params
-  const transactions = await getTransactions(DEV_USER_ID, id)
+  const transactions = await getTransactions(userId, id)
 
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
