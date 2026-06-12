@@ -25,7 +25,7 @@ export function InlineEditForm({
           name="amount"
           type="number"
           min="0.01"
-          step="0.01"
+          step="1"
           defaultValue={t.amount}
           required
           className="w-full py-1.5"
