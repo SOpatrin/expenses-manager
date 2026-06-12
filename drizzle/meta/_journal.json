@@ -8,6 +8,20 @@
       "when": 1781259017497,
       "tag": "0000_woozy_may_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781259683945,
+      "tag": "0001_dizzy_queen_noir",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781261163877,
+      "tag": "0002_flawless_gabe_jones",
+      "breakpoints": true
     }
   ]
 }

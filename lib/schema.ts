@@ -1,6 +1,7 @@
 import {
   customType,
   date,
+  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -22,36 +23,89 @@ const money = customType<{ data: number; driverData: number }>({
   },
 })
 
+// ── Auth.js tables ────────────────────────────────────────────────────────────
+
+export const users = pgTable('users', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name'),
+  email: text('email').unique(),
+  emailVerified: timestamp('email_verified', { mode: 'date' }),
+  image: text('image'),
+  password: text('password'), // только для credentials-провайдера
+})
+
+export const oauthAccounts = pgTable(
+  'oauth_accounts',
+  {
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: text('type').notNull(),
+    provider: text('provider').notNull(),
+    providerAccountId: text('provider_account_id').notNull(),
+    refresh_token: text('refresh_token'),
+    access_token: text('access_token'),
+    expires_at: integer('expires_at'),
+    token_type: text('token_type'),
+    scope: text('scope'),
+    id_token: text('id_token'),
+    session_state: text('session_state'),
+  },
+  (t) => [primaryKey({ columns: [t.provider, t.providerAccountId] })],
+)
+
+export const sessions = pgTable('sessions', {
+  sessionToken: text('session_token').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
+})
+
+export const verificationTokens = pgTable(
+  'verification_tokens',
+  {
+    identifier: text('identifier').notNull(),
+    token: text('token').notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.identifier, t.token] })],
+)
+
+// ── App tables ────────────────────────────────────────────────────────────────
+
 export const transactionTypeEnum = pgEnum('transaction_type', [
   'income',
   'expense',
 ])
 export const memberRoleEnum = pgEnum('member_role', ['owner', 'member'])
 
-export const accounts = pgTable('accounts', {
+export const wallets = pgTable('wallets', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
-export const accountMembers = pgTable(
-  'account_members',
+export const walletMembers = pgTable(
+  'wallet_members',
   {
-    accountId: uuid('account_id')
+    walletId: uuid('wallet_id')
       .notNull()
-      .references(() => accounts.id),
+      .references(() => wallets.id),
     userId: text('user_id').notNull(),
     role: memberRoleEnum('role').notNull().default('member'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
-  (t) => [primaryKey({ columns: [t.accountId, t.userId] })],
+  (t) => [primaryKey({ columns: [t.walletId, t.userId] })],
 )
 
 export const transactions = pgTable('transactions', {
   id: uuid('id').defaultRandom().primaryKey(),
-  accountId: uuid('account_id')
+  walletId: uuid('wallet_id')
     .notNull()
-    .references(() => accounts.id),
+    .references(() => wallets.id),
   createdBy: text('created_by').notNull(),
   amount: money('amount').notNull(),
   currency: text('currency').notNull().default('RUB'),
