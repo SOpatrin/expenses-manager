@@ -1,0 +1,88 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+
+import { createInviteAction, revokeInviteAction } from '@/app/actions/invites'
+import { Button } from '@/components/ui/button'
+import type { PendingInvite } from '@/lib/invites'
+
+export function InviteSection({
+  walletId,
+  pendingInvites,
+}: {
+  walletId: string
+  pendingInvites: PendingInvite[]
+}) {
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+
+  function handleCreate() {
+    startTransition(async () => {
+      const token = await createInviteAction(walletId)
+      setInviteUrl(`${window.location.origin}/invite/${token}`)
+    })
+  }
+
+  function handleCopy() {
+    if (inviteUrl) navigator.clipboard.writeText(inviteUrl)
+  }
+
+  return (
+    <div>
+      <h2 className="mb-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
+        Пригласить
+      </h2>
+
+      {inviteUrl ? (
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800/50">
+          <span className="flex-1 truncate font-mono text-xs text-zinc-600 dark:text-zinc-300">
+            {inviteUrl}
+          </span>
+          <button
+            onClick={handleCopy}
+            className="shrink-0 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+          >
+            Скопировать
+          </button>
+        </div>
+      ) : (
+        <Button
+          onClick={handleCreate}
+          disabled={isPending}
+          variant="outline"
+          className="mb-4"
+        >
+          {isPending ? '...' : 'Создать ссылку-приглашение'}
+        </Button>
+      )}
+
+      {pendingInvites.length > 0 && (
+        <div>
+          <p className="mb-2 text-xs text-zinc-400">Активные приглашения</p>
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            {pendingInvites.map((inv) => (
+              <li
+                key={inv.token}
+                className="flex items-center justify-between py-2"
+              >
+                <span className="font-mono text-xs text-zinc-500">
+                  {inv.email ?? inv.token.slice(0, 8) + '…'}
+                </span>
+                <form
+                  action={revokeInviteAction.bind(null, walletId, inv.token)}
+                >
+                  <button
+                    type="submit"
+                    className="text-xs text-zinc-400 hover:text-red-500 dark:hover:text-red-400"
+                  >
+                    Отозвать
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  )
+}
