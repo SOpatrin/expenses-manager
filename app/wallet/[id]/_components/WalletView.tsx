@@ -19,8 +19,13 @@ export default function WalletView({
     addState,
     isAdding,
     isDeleting,
+    isUpdating,
+    editingId,
     handleSubmit,
     handleDelete,
+    handleEdit,
+    handleCancelEdit,
+    handleUpdate,
   } = useTransactions(walletId, initialTransactions)
 
   return (
@@ -35,6 +40,11 @@ export default function WalletView({
         transactions={optimisticTransactions}
         onDelete={handleDelete}
         isDeleting={isDeleting}
+        editingId={editingId}
+        onEdit={handleEdit}
+        onUpdate={handleUpdate}
+        onCancelEdit={handleCancelEdit}
+        isUpdating={isUpdating}
       />
     </div>
   )

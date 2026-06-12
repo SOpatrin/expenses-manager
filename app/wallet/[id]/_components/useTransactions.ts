@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useOptimistic, useTransition } from 'react'
+import { useState, useActionState, useOptimistic, useTransition } from 'react'
 import { DEV_USER_ID } from '@/app/_dev'
 import { computeStats } from '@/lib/stats'
 import type { Transaction } from '@/lib/transactions'
@@ -8,23 +8,40 @@ import {
   type AddTransactionState,
   addTransaction,
   deleteTransactionAction,
+  updateTransactionAction,
 } from '../actions'
 
 type OptimisticAction =
   | { type: 'add'; formData: FormData }
   | { type: 'delete'; id: string }
+  | { type: 'update'; id: string; formData: FormData }
 
 export function useTransactions(
   walletId: string,
   initialTransactions: Transaction[],
 ) {
-  const [isDeleting, startTransition] = useTransition()
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [isDeleting, startDeleteTransition] = useTransition()
+  const [isUpdating, startUpdateTransition] = useTransition()
 
   const [optimisticTransactions, updateOptimistic] = useOptimistic(
     initialTransactions,
     (state: Transaction[], action: OptimisticAction) => {
       if (action.type === 'delete') {
         return state.filter((t) => t.id !== action.id)
+      }
+      if (action.type === 'update') {
+        return state.map((t) =>
+          t.id === action.id
+            ? {
+                ...t,
+                amount: Number(action.formData.get('amount')),
+                type: action.formData.get('type') as Transaction['type'],
+                category: (action.formData.get('category') as string) || null,
+                date: action.formData.get('date') as string,
+              }
+            : t,
+        )
       }
       const optimistic: Transaction = {
         id: crypto.randomUUID(),
@@ -54,9 +71,17 @@ export function useTransactions(
   }
 
   function handleDelete(id: string) {
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       updateOptimistic({ type: 'delete', id })
       await deleteTransactionAction(walletId, id)
+    })
+  }
+
+  function handleUpdate(id: string, formData: FormData) {
+    setEditingId(null)
+    startUpdateTransition(async () => {
+      updateOptimistic({ type: 'update', id, formData })
+      await updateTransactionAction(walletId, id, formData)
     })
   }
 
@@ -66,7 +91,12 @@ export function useTransactions(
     addState,
     isAdding,
     isDeleting,
+    isUpdating,
+    editingId,
     handleSubmit,
     handleDelete,
+    handleEdit: setEditingId,
+    handleCancelEdit: () => setEditingId(null),
+    handleUpdate,
   }
 }
