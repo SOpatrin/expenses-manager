@@ -10,6 +10,7 @@ import {
   deleteTransaction,
   updateTransaction,
 } from '@/lib/transactions'
+import { renameWallet } from '@/lib/wallets'
 
 const schema = z.object({
   amount: z.coerce.number().positive(),
@@ -70,6 +71,15 @@ export async function updateTransactionAction(
   if (!parsed.success) return
 
   await updateTransaction(userId, walletId, transactionId, parsed.data)
+  revalidatePath(`/wallet/${walletId}`)
+}
+
+export async function renameWalletAction(
+  walletId: string,
+  name: string,
+): Promise<void> {
+  const userId = await requireUserId()
+  await renameWallet(userId, walletId, name.trim())
   revalidatePath(`/wallet/${walletId}`)
 }
 
