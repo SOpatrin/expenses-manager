@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
+import { signOut } from '@/auth'
 import { requireUserId } from '@/lib/auth'
 import {
   createTransaction,
@@ -70,6 +71,10 @@ export async function updateTransactionAction(
 
   await updateTransaction(userId, walletId, transactionId, parsed.data)
   revalidatePath(`/wallet/${walletId}`)
+}
+
+export async function signOutAction(): Promise<void> {
+  await signOut({ redirectTo: '/login' })
 }
 
 export async function deleteTransactionAction(
