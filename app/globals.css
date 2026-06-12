@@ -127,4 +127,10 @@
   html {
     @apply font-sans;
   }
+  .select-chevron {
+    transition: rotate 0.2s ease;
+  }
+  select:open + .select-chevron {
+    rotate: 180deg;
+  }
 }
