@@ -1,17 +1,21 @@
 import type { Transaction } from './transactions'
 
-export type WalletStats = {
+export type CurrencyStats = {
   income: number
   expense: number
   balance: number
 }
 
+export type WalletStats = Record<string, CurrencyStats>
+
 export function computeStats(transactions: Transaction[]): WalletStats {
-  let income = 0
-  let expense = 0
+  const result: WalletStats = {}
   for (const t of transactions) {
-    if (t.type === 'income') income += t.amount
-    else expense += t.amount
+    const cur = t.currency
+    if (!result[cur]) result[cur] = { income: 0, expense: 0, balance: 0 }
+    if (t.type === 'income') result[cur].income += t.amount
+    else result[cur].expense += t.amount
+    result[cur].balance = result[cur].income - result[cur].expense
   }
-  return { income, expense, balance: income - expense }
+  return result
 }

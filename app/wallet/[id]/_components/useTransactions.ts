@@ -36,6 +36,8 @@ export function useTransactions(
             ? {
                 ...t,
                 amount: Number(action.formData.get('amount')),
+                currency:
+                  (action.formData.get('currency') as string) || t.currency,
                 type: action.formData.get('type') as Transaction['type'],
                 category: (action.formData.get('category') as string) || null,
                 date: action.formData.get('date') as string,
@@ -48,7 +50,7 @@ export function useTransactions(
         walletId,
         createdBy: DEV_USER_ID,
         amount: Number(action.formData.get('amount')),
-        currency: 'RUB',
+        currency: (action.formData.get('currency') as string) || 'RSD',
         type: action.formData.get('type') as Transaction['type'],
         category: (action.formData.get('category') as string) || null,
         description: (action.formData.get('description') as string) || null,

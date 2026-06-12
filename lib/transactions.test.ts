@@ -31,23 +31,25 @@ describe('transactions', () => {
     it('создаёт транзакцию и возвращает её с корректными полями', async () => {
       const result = await createTransaction(TEST_USER_ID, walletId, {
         amount: 350,
+        currency: 'RSD',
         type: 'expense',
         category: 'food',
         date: '2024-01-15',
       })
 
       expect(result.amount).toBe(350)
+      expect(result.currency).toBe('RSD')
       expect(result.type).toBe('expense')
       expect(result.category).toBe('food')
       expect(result.walletId).toBe(walletId)
       expect(result.createdBy).toBe(TEST_USER_ID)
-      expect(result.currency).toBe('RUB')
     })
 
     it('бросает ошибку если userId не имеет доступа к кошельку', async () => {
       await expect(
         createTransaction('stranger', walletId, {
           amount: 100,
+          currency: 'RSD',
           type: 'expense',
           date: '2024-01-15',
         }),
@@ -59,11 +61,13 @@ describe('transactions', () => {
     it('возвращает список, отсортированный по date DESC', async () => {
       await createTransaction(TEST_USER_ID, walletId, {
         amount: 100,
+        currency: 'RSD',
         type: 'expense',
         date: '2024-01-10',
       })
       await createTransaction(TEST_USER_ID, walletId, {
         amount: 200,
+        currency: 'RSD',
         type: 'income',
         date: '2024-01-15',
       })

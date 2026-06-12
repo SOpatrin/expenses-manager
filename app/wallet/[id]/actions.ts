@@ -12,6 +12,7 @@ import {
 
 const schema = z.object({
   amount: z.coerce.number().positive(),
+  currency: z.enum(['RSD', 'RUB', 'USD', 'EUR']),
   type: z.enum(['income', 'expense']),
   category: z.string().optional(),
   description: z.string().optional(),
@@ -32,6 +33,7 @@ export async function addTransaction(
 
   const parsed = schema.safeParse({
     amount: formData.get('amount'),
+    currency: formData.get('currency'),
     type: formData.get('type'),
     category: formData.get('category') || undefined,
     description: formData.get('description') || undefined,
@@ -57,6 +59,7 @@ export async function updateTransactionAction(
 
   const parsed = schema.safeParse({
     amount: formData.get('amount'),
+    currency: formData.get('currency'),
     type: formData.get('type'),
     category: formData.get('category') || undefined,
     description: formData.get('description') || undefined,
