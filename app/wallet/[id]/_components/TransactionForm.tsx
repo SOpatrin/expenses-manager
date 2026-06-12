@@ -4,10 +4,7 @@ import { useActionState, useOptimistic, useRef } from 'react'
 import { DEV_USER_ID } from '@/app/_dev'
 import { Button } from '@/components/ui/button'
 import type { Transaction } from '@/lib/transactions'
-import {
-  type AddTransactionState,
-  addTransaction,
-} from '../actions'
+import { type AddTransactionState, addTransaction } from '../actions'
 import TransactionList from './TransactionList'
 
 const today = new Date().toISOString().split('T')[0]
