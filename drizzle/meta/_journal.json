@@ -22,6 +22,13 @@
       "when": 1781261163877,
       "tag": "0002_flawless_gabe_jones",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781304530338,
+      "tag": "0003_marvelous_golden_guardian",
+      "breakpoints": true
     }
   ]
 }

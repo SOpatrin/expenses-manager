@@ -93,13 +93,28 @@ export const walletMembers = pgTable(
   {
     walletId: uuid('wallet_id')
       .notNull()
-      .references(() => wallets.id),
-    userId: text('user_id').notNull(),
+      .references(() => wallets.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
     role: memberRoleEnum('role').notNull().default('member'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
   (t) => [primaryKey({ columns: [t.walletId, t.userId] })],
 )
+
+export const walletInvites = pgTable('wallet_invites', {
+  token: uuid('token').defaultRandom().primaryKey(),
+  walletId: uuid('wallet_id')
+    .notNull()
+    .references(() => wallets.id, { onDelete: 'cascade' }),
+  invitedBy: text('invited_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  email: text('email'),
+  acceptedAt: timestamp('accepted_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
 
 export const transactions = pgTable('transactions', {
   id: uuid('id').defaultRandom().primaryKey(),

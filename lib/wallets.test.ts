@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { db } from './db'
-import { walletMembers, wallets } from './schema'
+import { users, walletMembers, wallets } from './schema'
 import {
   createWallet,
   getFirstWallet,
@@ -13,6 +13,13 @@ import {
 
 const TEST_USER_ID = 'test-user-wallets'
 
+beforeEach(async () => {
+  await db
+    .insert(users)
+    .values({ id: TEST_USER_ID, name: 'Test User' })
+    .onConflictDoNothing()
+})
+
 afterEach(async () => {
   const members = await db
     .select({ walletId: walletMembers.walletId })
@@ -20,9 +27,10 @@ afterEach(async () => {
     .where(eq(walletMembers.userId, TEST_USER_ID))
 
   for (const { walletId } of members) {
-    await db.delete(walletMembers).where(eq(walletMembers.walletId, walletId))
     await db.delete(wallets).where(eq(wallets.id, walletId))
   }
+
+  await db.delete(users).where(eq(users.id, TEST_USER_ID))
 })
 
 describe('getFirstWallet', () => {
