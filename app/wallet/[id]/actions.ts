@@ -13,7 +13,10 @@ import {
 import { removeWalletMember, renameWallet } from '@/lib/wallets'
 
 const schema = z.object({
-  amount: z.coerce.number().positive(),
+  amount: z.preprocess(
+    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
+    z.coerce.number().positive(),
+  ),
   currency: z.enum(['RSD', 'RUB', 'USD', 'EUR']),
   type: z.enum(['income', 'expense']),
   category: z.string().optional(),

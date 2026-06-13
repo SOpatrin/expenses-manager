@@ -29,9 +29,8 @@ export default function TransactionForm({
       <div className="flex gap-2">
         <Input
           name="amount"
-          type="number"
-          min="0.01"
-          step="0.01"
+          type="text"
+          inputMode="decimal"
           placeholder="Сумма"
           required
           className="w-full"
