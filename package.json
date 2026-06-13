@@ -12,6 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
+    "generate-icons": "tsx scripts/generate-icons.ts",
     "db:seed": "tsx --env-file=.env scripts/seed-test-users.ts",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -48,6 +49,7 @@
     "eslint-config-next": "16.2.9",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
+    "sharp": "^0.35.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^8.0.16",
