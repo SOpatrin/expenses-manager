@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 
 import { Toaster } from '@/components/ui/sonner'
+import { PwaRegister } from './_components/PwaRegister'
 
 const inter = Inter({
   variable: '--font-sans',
@@ -13,11 +14,20 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  themeColor: '#18181b',
 }
 
 export const metadata: Metadata = {
   title: 'Expense Tracker',
   description: 'Личный трекер доходов и расходов',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Расходы',
+  },
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export default function RootLayout({
@@ -30,6 +40,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
         <Toaster />
+        <PwaRegister />
       </body>
     </html>
   )
