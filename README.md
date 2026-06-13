@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Expense Tracker
 
-## Getting Started
+Трекер доходов и расходов с поддержкой нескольких кошельков и совместного доступа. Устанавливается на домашний экран как PWA.
 
-First, run the development server:
+## Стек
+
+- **Next.js 15** — App Router, RSC, Server Actions
+- **React 19** — `useActionState`, `useOptimistic`, `useFormStatus`
+- **TypeScript** strict
+- **Drizzle ORM** + **PostgreSQL** (Neon)
+- **Auth.js v5** — Google OAuth, email/password, гостевой режим
+- **Tailwind CSS** + **shadcn/ui**
+- Деплой: **Vercel**
+
+## Возможности
+
+- Транзакции: добавление, редактирование, удаление (расходы / доходы)
+- Несколько кошельков с переключением
+- Шаринг кошелька по инвайт-ссылке
+- Баланс и статистика по валютам (RSD, RUB, USD, EUR)
+- Вход через Google, email + пароль или без регистрации
+- Swipe-to-delete на мобильном
+- PWA — офлайн-фолбэк из кеша
+
+## Запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+pnpm dev   # HTTPS обязателен для SW и secure cookies
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+DATABASE_URL=
+AUTH_SECRET=
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+AUTH_RESEND_KEY=
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Команды
 
-## Learn More
+| Команда | Описание |
+|---|---|
+| `pnpm dev` | Dev-сервер с HTTPS |
+| `pnpm build` | Миграции + production build |
+| `pnpm test` | Vitest |
+| `pnpm db:generate` | Сгенерировать миграцию |
+| `pnpm db:migrate` | Применить миграции |
+| `pnpm db:studio` | Drizzle Studio |
 
-To learn more about Next.js, take a look at the following resources:
+## Архитектура
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+lib/     — доменная логика, чистые функции
+app/     — Next App Router: страницы, Server Actions, компоненты
+docs/    — decisions.md, roadmap.md
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Вся логика работы с данными — в `lib/`, Server Actions — только тонкие обёртки
+- `userId` всегда из сессии Auth.js, передаётся явно
