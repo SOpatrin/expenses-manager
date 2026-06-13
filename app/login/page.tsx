@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
+import { signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
 
 import { signInWithGoogle } from './actions'
@@ -39,6 +41,12 @@ export default async function LoginPage({
     typeof callbackUrl === 'string' && callbackUrl.startsWith('/')
       ? callbackUrl
       : '/'
+
+  const jar = await cookies()
+  const guestToken = jar.get('guest-token')?.value
+  if (guestToken) {
+    await signIn('credentials', { guestToken, redirectTo: safeCallbackUrl })
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col items-center justify-center bg-zinc-50">

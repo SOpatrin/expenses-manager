@@ -1,8 +1,13 @@
 'use server'
 
 import { AuthError } from 'next-auth'
+import { cookies } from 'next/headers'
 
 import { signIn } from '@/auth'
+import { createGuestUser } from '@/lib/guest'
+
+const GUEST_TOKEN_COOKIE = 'guest-token'
+const GUEST_TOKEN_MAX_AGE = 60 * 60 * 24 * 365 // 1 год
 
 export async function loginWithCredentials(
   callbackUrl: string,
@@ -24,4 +29,19 @@ export async function loginWithCredentials(
 
 export async function signInWithGoogle(callbackUrl: string) {
   await signIn('google', { redirectTo: callbackUrl })
+}
+
+export async function signInAsGuest(callbackUrl: string) {
+  const jar = await cookies()
+  const { guestToken } = await createGuestUser()
+
+  jar.set(GUEST_TOKEN_COOKIE, guestToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    maxAge: GUEST_TOKEN_MAX_AGE,
+    path: '/',
+  })
+
+  await signIn('credentials', { guestToken, redirectTo: callbackUrl })
 }
