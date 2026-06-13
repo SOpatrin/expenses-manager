@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,7 +9,13 @@ import { Input } from '@/components/ui/input'
 import { loginWithCredentials } from '../actions'
 
 export function LoginForm() {
-  const [error, action, isPending] = useActionState(loginWithCredentials, null)
+  const searchParams = useSearchParams()
+  const raw = searchParams.get('callbackUrl') ?? '/'
+  const callbackUrl = raw.startsWith('/') ? raw : '/'
+  const [error, action, isPending] = useActionState(
+    loginWithCredentials.bind(null, callbackUrl),
+    null,
+  )
 
   return (
     <form action={action} method="post" className="space-y-3">
