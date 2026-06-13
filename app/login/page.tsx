@@ -1,11 +1,9 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 
-import { signIn } from '@/auth'
 import { Button } from '@/components/ui/button'
 
-import { signInWithGoogle } from './actions'
+import { signInAsGuest, signInWithGoogle } from './actions'
 import { LoginForm } from './_components/LoginForm'
 
 function GoogleIcon() {
@@ -41,12 +39,6 @@ export default async function LoginPage({
     typeof callbackUrl === 'string' && callbackUrl.startsWith('/')
       ? callbackUrl
       : '/'
-
-  const jar = await cookies()
-  const guestToken = jar.get('guest-token')?.value
-  if (guestToken) {
-    await signIn('credentials', { guestToken, redirectTo: safeCallbackUrl })
-  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col items-center justify-center bg-zinc-50">
@@ -85,6 +77,15 @@ export default async function LoginPage({
             Зарегистрироваться
           </Link>
         </p>
+
+        <form action={signInAsGuest.bind(null, safeCallbackUrl)}>
+          <button
+            type="submit"
+            className="w-full text-center text-xs text-zinc-400 hover:text-zinc-600"
+          >
+            войти без регистрации
+          </button>
+        </form>
       </div>
     </div>
   )
