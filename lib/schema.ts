@@ -1,4 +1,5 @@
 import {
+  boolean,
   customType,
   date,
   integer,
@@ -33,7 +34,9 @@ export const users = pgTable('users', {
   email: text('email').unique(),
   emailVerified: timestamp('email_verified', { mode: 'date' }),
   image: text('image'),
-  password: text('password'), // только для credentials-провайдера
+  password: text('password'),
+  isGuest: boolean('is_guest').notNull().default(false),
+  guestToken: text('guest_token').unique(),
 })
 
 export const oauthAccounts = pgTable(
