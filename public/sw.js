@@ -1,4 +1,4 @@
-const CACHE = 'expense-tracker-v1'
+const CACHE = 'expense-tracker-v2'
 
 const STATIC = ['/']
 
@@ -24,7 +24,6 @@ self.addEventListener('fetch', (event) => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Skip non-GET, cross-origin, and Next.js internals
   if (
     request.method !== 'GET' ||
     url.origin !== self.location.origin ||
@@ -34,7 +33,16 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Network-first for navigation (HTML pages)
+  // RSC-запросы Next.js — всегда в сеть, никогда не кешировать
+  if (
+    request.headers.get('RSC') ||
+    request.headers.get('Next-Router-State-Tree') ||
+    request.headers.get('Next-Router-Prefetch')
+  ) {
+    return
+  }
+
+  // Полная навигация — network-first с офлайн-фолбэком
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).catch(() => caches.match('/') ?? Response.error()),
@@ -42,17 +50,21 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Cache-first for static assets
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const clone = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(request, clone))
-        }
-        return response
-      })
-    }),
-  )
+  // Cache-first только для статики: иконки, картинки, манифест
+  if (/\.(png|jpg|jpeg|svg|ico|webmanifest|woff2?)$/.test(url.pathname)) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ??
+          fetch(request).then((response) => {
+            if (response.ok) {
+              caches
+                .open(CACHE)
+                .then((cache) => cache.put(request, response.clone()))
+            }
+            return response
+          }),
+      ),
+    )
+  }
 })
