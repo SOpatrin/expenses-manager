@@ -35,7 +35,9 @@ export default async function LoginPage({
 }) {
   const { callbackUrl } = await searchParams
   const safeCallbackUrl =
-    typeof callbackUrl === 'string' && callbackUrl.startsWith('/') ? callbackUrl : '/'
+    typeof callbackUrl === 'string' && callbackUrl.startsWith('/')
+      ? callbackUrl
+      : '/'
 
   return (
     <div className="flex min-h-full flex-1 flex-col items-center justify-center bg-zinc-50">
