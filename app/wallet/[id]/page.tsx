@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUser } from '@/lib/auth'
 import { getTransactions } from '@/lib/transactions'
 import { getWallet } from '@/lib/wallets'
 
@@ -15,7 +15,7 @@ export default async function WalletPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const userId = await requireUserId()
+  const { id: userId, isGuest } = await requireUser()
 
   const { id } = await params
   const [wallet, transactions] = await Promise.all([
@@ -37,12 +37,14 @@ export default async function WalletPage({
         </Link>
         <WalletNameEditor walletId={id} initialName={wallet.name} />
         <div className="flex items-center gap-3">
-          <Link
-            href={`/wallet/${id}/settings`}
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          >
-            Участники
-          </Link>
+          {!isGuest && (
+            <Link
+              href={`/wallet/${id}/settings`}
+              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            >
+              Участники
+            </Link>
+          )}
           <form action={signOutAction}>
             <button
               type="submit"

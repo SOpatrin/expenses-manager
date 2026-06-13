@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUser } from '@/lib/auth'
 import { getWalletInvites } from '@/lib/invites'
 import { getWallet, getWalletMembers } from '@/lib/wallets'
 
@@ -13,7 +13,8 @@ export default async function WalletSettingsPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const userId = await requireUserId()
+  const { id: userId, isGuest } = await requireUser()
+  if (isGuest) notFound()
   const { id } = await params
 
   const wallet = await getWallet(userId, id)
