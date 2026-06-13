@@ -5,6 +5,7 @@ import { AuthError } from 'next-auth'
 import { signIn } from '@/auth'
 
 export async function loginWithCredentials(
+  callbackUrl: string,
   _prevState: string | null,
   formData: FormData,
 ): Promise<string | null> {
@@ -12,7 +13,7 @@ export async function loginWithCredentials(
     await signIn('credentials', {
       email: formData.get('email'),
       password: formData.get('password'),
-      redirectTo: '/',
+      redirectTo: callbackUrl,
     })
   } catch (e) {
     if (e instanceof AuthError) return 'Неверный email или пароль'
@@ -21,6 +22,6 @@ export async function loginWithCredentials(
   return null
 }
 
-export async function signInWithGoogle() {
-  await signIn('google', { redirectTo: '/' })
+export async function signInWithGoogle(callbackUrl: string) {
+  await signIn('google', { redirectTo: callbackUrl })
 }

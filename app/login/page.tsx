@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import { Button } from '@/components/ui/button'
 
 import { signInWithGoogle } from './actions'
@@ -26,7 +28,15 @@ function GoogleIcon() {
   )
 }
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>
+}) {
+  const { callbackUrl } = await searchParams
+  const safeCallbackUrl =
+    typeof callbackUrl === 'string' && callbackUrl.startsWith('/') ? callbackUrl : '/'
+
   return (
     <div className="flex min-h-full flex-1 flex-col items-center justify-center bg-zinc-50">
       <div className="w-full max-w-sm space-y-6 rounded-xl bg-white p-8 shadow-sm">
@@ -35,7 +45,7 @@ export default function LoginPage() {
           <p className="mt-1 text-sm text-zinc-500">Expense Tracker</p>
         </div>
 
-        <form action={signInWithGoogle}>
+        <form action={signInWithGoogle.bind(null, safeCallbackUrl)}>
           <Button type="submit" variant="outline" className="w-full gap-2">
             <GoogleIcon />
             Войти через Google
@@ -51,7 +61,9 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <LoginForm />
+        <Suspense>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   )
