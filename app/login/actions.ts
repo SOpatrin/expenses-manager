@@ -33,15 +33,21 @@ export async function signInWithGoogle(callbackUrl: string) {
 
 export async function signInAsGuest(callbackUrl: string) {
   const jar = await cookies()
-  const { guestToken } = await createGuestUser()
+  const existing = jar.get(GUEST_TOKEN_COOKIE)?.value
 
-  jar.set(GUEST_TOKEN_COOKIE, guestToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax',
-    maxAge: GUEST_TOKEN_MAX_AGE,
-    path: '/',
-  })
+  let guestToken = existing
+
+  if (!guestToken) {
+    const guest = await createGuestUser()
+    guestToken = guest.guestToken
+    jar.set(GUEST_TOKEN_COOKIE, guestToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: GUEST_TOKEN_MAX_AGE,
+      path: '/',
+    })
+  }
 
   await signIn('credentials', { guestToken, redirectTo: callbackUrl })
 }
