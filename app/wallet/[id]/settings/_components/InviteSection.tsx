@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { Copy } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { createInviteAction, revokeInviteAction } from '@/app/actions/invites'
 import { Button } from '@/components/ui/button'
@@ -23,12 +25,17 @@ export function InviteSection({
   function handleCreate() {
     startTransition(async () => {
       const token = await createInviteAction(walletId)
-      setInviteUrl(`${window.location.origin}/invite/${token}`)
+      const url = `${window.location.origin}/invite/${token}`
+      setInviteUrl(url)
+      navigator.clipboard.writeText(url)
+      toast.success('Ссылка скопирована')
     })
   }
 
   function handleCopy() {
-    if (inviteUrl) navigator.clipboard.writeText(inviteUrl)
+    if (!inviteUrl) return
+    navigator.clipboard.writeText(inviteUrl)
+    toast.success('Ссылка скопирована')
   }
 
   return (
@@ -38,17 +45,15 @@ export function InviteSection({
       </h2>
 
       {inviteUrl ? (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800/50">
+        <button
+          onClick={handleCopy}
+          className="mb-4 flex w-full items-center gap-2 rounded-lg bg-zinc-50 px-3 py-2 text-left hover:bg-zinc-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800"
+        >
           <span className="flex-1 truncate font-mono text-xs text-zinc-600 dark:text-zinc-300">
             {inviteUrl}
           </span>
-          <button
-            onClick={handleCopy}
-            className="shrink-0 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          >
-            Скопировать
-          </button>
-        </div>
+          <Copy className="size-3.5 shrink-0 text-zinc-400" />
+        </button>
       ) : (
         <Button
           onClick={handleCreate}
