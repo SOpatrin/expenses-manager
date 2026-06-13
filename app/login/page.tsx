@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 
@@ -66,6 +67,16 @@ export default async function LoginPage({
         <Suspense>
           <LoginForm />
         </Suspense>
+
+        <p className="text-center text-sm text-zinc-500">
+          Ещё нет аккаунта?{' '}
+          <Link
+            href={`/register${safeCallbackUrl !== '/' ? `?callbackUrl=${safeCallbackUrl}` : ''}`}
+            className="text-zinc-900 underline"
+          >
+            Зарегистрироваться
+          </Link>
+        </p>
       </div>
     </div>
   )
