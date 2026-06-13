@@ -13,7 +13,7 @@ export default async function WalletsPage() {
   const wallets = await getWallets(userId)
 
   return (
-    <main className="mx-auto max-w-lg px-4 py-8">
+    <main className="mx-auto w-full max-w-lg px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           Кошельки
