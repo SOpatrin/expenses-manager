@@ -18,7 +18,7 @@ export function LoginForm() {
   )
 
   return (
-    <form action={action} method="post" className="space-y-3">
+    <form action={action} className="space-y-3">
       <Input
         name="email"
         type="email"
