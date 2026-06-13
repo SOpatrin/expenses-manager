@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
+import { Toaster } from '@/components/ui/sonner'
+
 const inter = Inter({
   variable: '--font-sans',
   subsets: ['latin', 'cyrillic'],
@@ -27,6 +29,7 @@ export default function RootLayout({
     <html lang="ru" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
+        <Toaster />
       </body>
     </html>
   )
