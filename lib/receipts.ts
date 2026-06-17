@@ -38,16 +38,17 @@ export async function parseReceiptImage(
   const response = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 256,
-    system: `You are a receipt parser. Extract transaction data and return ONLY valid JSON:
+    system: `You are a receipt parser. Extract transaction data and return ONLY a valid JSON object — no markdown, no explanation.
+
+Output format:
 {"amount": number, "currency": "RSD"|"RUB"|"USD"|"EUR", "type": "expense"|"income", "category": string, "date": "YYYY-MM-DD"}
 
-Rules:
-- amount: final total paid (positive)
-- currency: detect from symbols (€=EUR, $=USD, ₽/руб=RUB, дин/din/RSD=RSD), default RUB
-- type: "expense" for receipts
-- category: short word matching receipt language (e.g. "Продукты", "Ресторан", "Transport")
-- date: from receipt; if not visible use ${today}
-- Return ONLY the JSON object, no markdown, no explanation`,
+Field rules:
+- amount: the FINAL amount the customer paid. Find the grand total line: УКУПНО / ЗА НАПЛАТУ / TOTAL / ИТОГО / Готовина / К оплате. NEVER take a VAT/tax line (ПДВ, НДС, Порез, PDV, Tax) — those are sub-components of the total, not the total itself.
+- currency: infer from currency symbols or text on the receipt (€→EUR, $→USD, ₽/руб→RUB, дин/din/RSD→RSD). Default: RSD.
+- type: "expense" for purchases/receipts, "income" only if it is clearly a sales receipt or refund to the customer.
+- category: one short descriptive word in the receipt's language (e.g. "Продукты", "Ресторан", "Козметика", "Transport", "Горivo").
+- date: transaction date from the receipt (YYYY-MM-DD). If not found, use ${today}.`,
     messages: [
       {
         role: 'user',
@@ -62,18 +63,33 @@ Rules:
     ],
   })
 
-  const block = response.content[0]
-  if (block.type !== 'text') throw new Error('Не удалось распознать чек')
+  const block = response.content.find((b) => b.type === 'text')
+  if (!block || block.type !== 'text')
+    throw new Error('Не удалось распознать чек')
+
+  const cleaned = block.text
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/```\s*$/i, '')
+    .trim()
 
   let raw: unknown
   try {
-    raw = JSON.parse(block.text)
+    raw = JSON.parse(cleaned)
   } catch {
+    console.error('[receipts] JSON parse failed, raw text:', block.text)
     throw new Error('Не удалось распознать чек')
   }
 
   const parsed = ReceiptDraftSchema.safeParse(raw)
-  if (!parsed.success) throw new Error('Не удалось распознать чек')
+  if (!parsed.success) {
+    console.error(
+      '[receipts] Zod validation failed:',
+      parsed.error.issues,
+      'raw:',
+      raw,
+    )
+    throw new Error('Не удалось распознать чек')
+  }
 
   return parsed.data
 }
