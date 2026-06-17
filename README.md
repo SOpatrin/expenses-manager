@@ -41,14 +41,14 @@ AUTH_RESEND_KEY=
 
 ## Команды
 
-| Команда | Описание |
-|---|---|
-| `pnpm dev` | Dev-сервер с HTTPS |
-| `pnpm build` | Миграции + production build |
-| `pnpm test` | Vitest |
-| `pnpm db:generate` | Сгенерировать миграцию |
-| `pnpm db:migrate` | Применить миграции |
-| `pnpm db:studio` | Drizzle Studio |
+| Команда            | Описание                    |
+| ------------------ | --------------------------- |
+| `pnpm dev`         | Dev-сервер с HTTPS          |
+| `pnpm build`       | Миграции + production build |
+| `pnpm test`        | Vitest                      |
+| `pnpm db:generate` | Сгенерировать миграцию      |
+| `pnpm db:migrate`  | Применить миграции          |
+| `pnpm db:studio`   | Drizzle Studio              |
 
 ## Архитектура
 
