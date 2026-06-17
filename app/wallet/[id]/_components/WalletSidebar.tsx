@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { ThemeToggle } from '@/app/_components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Wallet } from '@/lib/wallets'
@@ -39,6 +40,7 @@ export function WalletSidebar({
           + Создать
         </Button>
       </form>
+      <ThemeToggle className="mt-4" />
     </aside>
   )
 }

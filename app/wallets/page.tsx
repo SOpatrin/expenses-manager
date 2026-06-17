@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { ThemeToggle } from '@/app/_components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { requireUserId } from '@/lib/auth'
@@ -18,14 +19,17 @@ export default async function WalletsPage() {
         <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           Кошельки
         </h1>
-        <form action={signOutAction}>
-          <button
-            type="submit"
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
-          >
-            Выйти
-          </button>
-        </form>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            >
+              Выйти
+            </button>
+          </form>
+        </div>
       </div>
 
       <ul className="mb-8 flex flex-col divide-y divide-zinc-100 dark:divide-zinc-800">
