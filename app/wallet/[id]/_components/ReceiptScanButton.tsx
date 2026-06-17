@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect, useRef } from 'react'
+import { useActionState, useEffect, useRef, useTransition } from 'react'
 import { Camera, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { type ScanReceiptState, scanReceiptAction } from '../actions'
@@ -41,11 +41,12 @@ export default function ReceiptScanButton({
   disabled?: boolean
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isPending, startTransition] = useTransition()
 
-  const [scanState, submitScan, isScanning] = useActionState<
-    ScanReceiptState,
-    FormData
-  >(scanReceiptAction.bind(null, walletId), { status: 'idle' })
+  const [scanState, submitScan] = useActionState<ScanReceiptState, FormData>(
+    scanReceiptAction.bind(null, walletId),
+    { status: 'idle' },
+  )
 
   useEffect(() => {
     if (scanState.status === 'success') {
@@ -62,7 +63,7 @@ export default function ReceiptScanButton({
     const image = await compressImage(file)
     const fd = new FormData()
     fd.set('image', image)
-    submitScan(fd)
+    startTransition(() => submitScan(fd))
   }
 
   return (
@@ -79,14 +80,14 @@ export default function ReceiptScanButton({
         type="button"
         size="icon"
         variant="outline"
-        disabled={disabled || isScanning}
+        disabled={disabled || isPending}
         onClick={() => inputRef.current?.click()}
         title={
           scanState.status === 'error' ? scanState.message : 'Сканировать чек'
         }
         className={scanState.status === 'error' ? 'border-red-500' : ''}
       >
-        {isScanning ? <Loader2 className="animate-spin" /> : <Camera />}
+        {isPending ? <Loader2 className="animate-spin" /> : <Camera />}
       </Button>
     </>
   )
