@@ -23,6 +23,7 @@
 - [ ] **Telegram bot** — вебхук → вызов lib/ → ответ
 - [ ] **Офлайн-режим** — IDB-зеркало, queue-first запись, /api/sync, SW-кеш страниц. Подробный план: [docs/offline.md](offline.md)
 - [x] **localStorage persistence** — `useLocalStorage` хук, сохранение валюты и типа транзакции между сессиями
+- [x] **Тёмная тема** — light/dark/system, inline-скрипт против мерцания, `useTheme` поверх `useLocalStorage`, переключатель в сайдбаре и на странице кошельков
 
 ## М4 — Фильтры & Аналитика
 

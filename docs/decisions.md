@@ -113,6 +113,14 @@
 - Тесты сами создают данные в `beforeEach` и удаляют в `afterEach`.
 - Dev-ветка Neon изолирует тестовые данные от продакшн.
 
+## Тёмная тема: class-based + inline script
+
+- Тема управляется классом `dark` на `<html>`, а не только `@media prefers-color-scheme` — так переключение работает независимо от ОС.
+- Предпочтение (`light | dark | system`) хранится в `localStorage`; `useTheme` компонуется поверх `useLocalStorage`.
+- Inline `<script>` в `layout.tsx` читает `localStorage` синхронно до рендера и вешает класс `dark` — устраняет мерцание белого экрана при загрузке.
+- `suppressHydrationWarning` на `<html>`: сервер не знает предпочтений пользователя, расхождение намеренное.
+- `color-scheme: light` на `:root` и `color-scheme: dark` на `.dark` — браузер сам переключает нативные контролы (date picker, скроллбар).
+
 ## Миграции в build
 
 - `drizzle-kit migrate && next build` — миграции применяются перед каждым деплоем на Vercel.
