@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "receipt_scan_limit" integer DEFAULT 5 NOT NULL;

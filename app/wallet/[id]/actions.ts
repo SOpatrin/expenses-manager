@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { signOut } from '@/auth'
 import { requireUserId } from '@/lib/auth'
+import { checkAndIncrementScanLimit } from '@/lib/receipt-limits'
 import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
 import {
   createTransaction,
@@ -120,6 +121,14 @@ export async function scanReceiptAction(
   // base64 строка примерно на 33% длиннее бинарного файла; лимит ~4 MB
   if (image.length > 5_500_000) {
     return { status: 'error', message: 'Файл слишком большой' }
+  }
+
+  const { allowed, limit } = await checkAndIncrementScanLimit(userId)
+  if (!allowed) {
+    return {
+      status: 'error',
+      message: `Достигнут лимит сканирований на сегодня (${limit} в день)`,
+    }
   }
 
   try {

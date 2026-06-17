@@ -36,6 +36,20 @@
       "when": 1781356050088,
       "tag": "0004_dashing_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781735929715,
+      "tag": "0005_flaky_morg",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781736127821,
+      "tag": "0006_brainy_selene",
+      "breakpoints": true
     }
   ]
 }

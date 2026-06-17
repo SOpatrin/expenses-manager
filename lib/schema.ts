@@ -37,6 +37,9 @@ export const users = pgTable('users', {
   password: text('password'),
   isGuest: boolean('is_guest').notNull().default(false),
   guestToken: text('guest_token').unique(),
+  receiptScansToday: integer('receipt_scans_today').notNull().default(0),
+  receiptScansResetAt: timestamp('receipt_scans_reset_at'),
+  receiptScanLimit: integer('receipt_scan_limit').notNull().default(5),
 })
 
 export const oauthAccounts = pgTable(
