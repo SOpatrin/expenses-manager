@@ -67,13 +67,13 @@ export default function WalletStats({
 
   if (transactions.length === 0) return null
 
-  const hasRates = Object.keys(rates).length > 0
+  const availableCurrencies = SUPPORTED_CURRENCIES.filter((c) => c in rates)
 
   return (
     <div className="flex flex-col gap-3">
-      {hasRates && (
+      {availableCurrencies.length > 0 && (
         <div className="flex gap-1.5">
-          {(['all', ...SUPPORTED_CURRENCIES] as const).map((c) => {
+          {(['all', ...availableCurrencies] as const).map((c) => {
             const active =
               c === 'all' ? displayCurrency === '' : displayCurrency === c
             return (
@@ -93,7 +93,7 @@ export default function WalletStats({
         </div>
       )}
 
-      {displayCurrency !== '' ? (
+      {displayCurrency !== '' && displayCurrency in rates ? (
         <StatCard
           currency={displayCurrency}
           s={computeUnifiedStats(transactions, rates, displayCurrency)}

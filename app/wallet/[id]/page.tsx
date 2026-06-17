@@ -22,7 +22,7 @@ export default async function WalletPage({
   const [wallet, transactions, rates] = await Promise.all([
     getWallet(userId, id),
     getTransactions(userId, id),
-    getRates('USD').catch(() => ({}) as Record<string, number>),
+    getRates('USD').catch((): Record<string, number> => ({})),
   ])
 
   if (!wallet) notFound()

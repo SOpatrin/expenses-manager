@@ -8,7 +8,7 @@ type ExchangeRateResponse = {
 
 export async function getRates(base: string): Promise<Record<string, number>> {
   const key = process.env.EXCHANGERATE_API_KEY
-  if (!key) throw new Error('EXCHANGERATE_API_KEY is not set')
+  if (!key) return {}
 
   const res = await fetch(
     `https://v6.exchangerate-api.com/v6/${key}/latest/${base}`,

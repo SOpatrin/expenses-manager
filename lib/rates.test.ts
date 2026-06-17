@@ -28,9 +28,9 @@ describe('getRates', () => {
     expect(rates['RSD']).toBe(107.2)
   })
 
-  it('throws when API key is missing', async () => {
+  it('returns empty object when API key is missing', async () => {
     vi.stubEnv('EXCHANGERATE_API_KEY', '')
-    await expect(getRates('USD')).rejects.toThrow('EXCHANGERATE_API_KEY')
+    await expect(getRates('USD')).resolves.toEqual({})
   })
 
   it('throws on non-ok status', async () => {
