@@ -2,7 +2,6 @@
 
 import { useState, useActionState, useOptimistic, useTransition } from 'react'
 import { DEV_USER_ID } from '@/app/_dev'
-import { computeStats } from '@/lib/stats'
 import type { Transaction } from '@/lib/transactions'
 import {
   type AddTransactionState,
@@ -93,7 +92,6 @@ export function useTransactions(
 
   return {
     optimisticTransactions,
-    stats: computeStats(optimisticTransactions),
     addState,
     isAdding,
     isDeleting,

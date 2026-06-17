@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { requireUser } from '@/lib/auth'
+import { getRates } from '@/lib/rates'
 import { getTransactions } from '@/lib/transactions'
 import { getWallet } from '@/lib/wallets'
 
@@ -18,9 +19,10 @@ export default async function WalletPage({
   const { id: userId, isGuest } = await requireUser()
 
   const { id } = await params
-  const [wallet, transactions] = await Promise.all([
+  const [wallet, transactions, rates] = await Promise.all([
     getWallet(userId, id),
     getTransactions(userId, id),
+    getRates('USD').catch(() => ({}) as Record<string, number>),
   ])
 
   if (!wallet) notFound()
@@ -55,7 +57,11 @@ export default async function WalletPage({
           </form>
         </div>
       </div>
-      <WalletView walletId={id} initialTransactions={transactions} />
+      <WalletView
+        walletId={id}
+        initialTransactions={transactions}
+        rates={rates}
+      />
       <div className="mt-16 flex justify-center">
         <DeleteWalletButton walletId={id} />
       </div>

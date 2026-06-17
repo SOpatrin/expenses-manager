@@ -9,13 +9,14 @@ import { useTransactions } from './useTransactions'
 export default function WalletView({
   walletId,
   initialTransactions,
+  rates,
 }: {
   walletId: string
   initialTransactions: Transaction[]
+  rates: Record<string, number>
 }) {
   const {
     optimisticTransactions,
-    stats,
     addState,
     isAdding,
     isDeleting,
@@ -30,7 +31,7 @@ export default function WalletView({
 
   return (
     <div className="flex flex-col gap-6">
-      <WalletStats stats={stats} />
+      <WalletStats transactions={optimisticTransactions} rates={rates} />
       <TransactionForm
         onSubmit={handleSubmit}
         addState={addState}
