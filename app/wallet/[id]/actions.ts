@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { signOut } from '@/auth'
 import { requireUserId } from '@/lib/auth'
+import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
 import {
   createTransaction,
   deleteTransaction,
@@ -97,6 +98,36 @@ export async function removeWalletMemberAction(
 
 export async function signOutAction(): Promise<void> {
   await signOut({ redirectTo: '/login' })
+}
+
+export type ScanReceiptState =
+  | { status: 'idle' }
+  | { status: 'error'; message: string }
+  | { status: 'success'; data: ReceiptDraft }
+
+export async function scanReceiptAction(
+  _walletId: string,
+  _prevState: ScanReceiptState,
+  formData: FormData,
+): Promise<ScanReceiptState> {
+  const userId = await requireUserId()
+
+  const image = formData.get('image')
+  if (typeof image !== 'string' || !image) {
+    return { status: 'error', message: 'Изображение не передано' }
+  }
+
+  // base64 строка примерно на 33% длиннее бинарного файла; лимит ~4 MB
+  if (image.length > 5_500_000) {
+    return { status: 'error', message: 'Файл слишком большой' }
+  }
+
+  try {
+    const data = await parseReceiptImage(image, userId)
+    return { status: 'success', data }
+  } catch {
+    return { status: 'error', message: 'Не удалось распознать чек' }
+  }
 }
 
 export async function deleteTransactionAction(
