@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useLocalStorage } from '@/app/_hooks/useLocalStorage'
 import { SUPPORTED_CURRENCIES } from '@/lib/rates'
 import {
   computeStats,
@@ -8,8 +8,6 @@ import {
   type CurrencyStats,
 } from '@/lib/stats'
 import type { Transaction } from '@/lib/transactions'
-
-const STORAGE_KEY = 'display-currency'
 
 function fmt(amount: number, currency: string) {
   return new Intl.NumberFormat('ru-RU', {
@@ -62,23 +60,14 @@ export default function WalletStats({
   transactions: Transaction[]
   rates: Record<string, number>
 }) {
-  const [displayCurrency, setDisplayCurrency] = useState<string | null>(null)
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDisplayCurrency(localStorage.getItem(STORAGE_KEY))
-  }, [])
+  const [displayCurrency, setDisplayCurrency] = useLocalStorage(
+    'display-currency',
+    '',
+  )
 
   if (transactions.length === 0) return null
 
   const hasRates = Object.keys(rates).length > 0
-
-  function handleChange(value: string) {
-    const next = value === '' ? null : value
-    setDisplayCurrency(next)
-    if (next) localStorage.setItem(STORAGE_KEY, next)
-    else localStorage.removeItem(STORAGE_KEY)
-  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -86,11 +75,11 @@ export default function WalletStats({
         <div className="flex gap-1.5">
           {(['all', ...SUPPORTED_CURRENCIES] as const).map((c) => {
             const active =
-              c === 'all' ? !displayCurrency : displayCurrency === c
+              c === 'all' ? displayCurrency === '' : displayCurrency === c
             return (
               <button
                 key={c}
-                onClick={() => handleChange(c === 'all' ? '' : c)}
+                onClick={() => setDisplayCurrency(c === 'all' ? '' : c)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   active
                     ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
@@ -104,7 +93,7 @@ export default function WalletStats({
         </div>
       )}
 
-      {displayCurrency ? (
+      {displayCurrency !== '' ? (
         <StatCard
           currency={displayCurrency}
           s={computeUnifiedStats(transactions, rates, displayCurrency)}

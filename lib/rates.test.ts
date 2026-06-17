@@ -29,7 +29,7 @@ describe('getRates', () => {
   })
 
   it('throws when API key is missing', async () => {
-    vi.unstubAllEnvs()
+    vi.stubEnv('EXCHANGERATE_API_KEY', '')
     await expect(getRates('USD')).rejects.toThrow('EXCHANGERATE_API_KEY')
   })
 

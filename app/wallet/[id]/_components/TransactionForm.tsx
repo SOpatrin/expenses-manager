@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useLocalStorage } from '@/app/_hooks/useLocalStorage'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -17,15 +17,15 @@ export default function TransactionForm({
   addState: AddTransactionState
   isAdding: boolean
 }) {
-  const formRef = useRef<HTMLFormElement>(null)
+  const [currency, setCurrency] = useLocalStorage('tx-currency', 'RSD')
+  const [type, setType] = useLocalStorage('tx-type', 'expense')
 
   function handleAction(formData: FormData) {
     onSubmit(formData)
-    formRef.current?.reset()
   }
 
   return (
-    <form ref={formRef} action={handleAction} className="flex flex-col gap-3">
+    <form action={handleAction} className="flex flex-col gap-3">
       <div className="flex gap-2">
         <Input
           name="amount"
@@ -35,13 +35,23 @@ export default function TransactionForm({
           required
           className="w-full"
         />
-        <NativeSelect name="currency" defaultValue="RSD">
+        <NativeSelect
+          key={currency}
+          name="currency"
+          defaultValue={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+        >
           <option value="RSD">RSD</option>
           <option value="RUB">RUB</option>
           <option value="USD">USD</option>
           <option value="EUR">EUR</option>
         </NativeSelect>
-        <NativeSelect name="type" defaultValue="expense">
+        <NativeSelect
+          key={type}
+          name="type"
+          defaultValue={type}
+          onChange={(e) => setType(e.target.value)}
+        >
           <option value="expense">Расход</option>
           <option value="income">Доход</option>
         </NativeSelect>
