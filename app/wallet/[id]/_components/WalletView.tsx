@@ -33,6 +33,7 @@ export default function WalletView({
     <div className="flex flex-col gap-6">
       <WalletStats transactions={optimisticTransactions} rates={rates} />
       <TransactionForm
+        walletId={walletId}
         onSubmit={handleSubmit}
         addState={addState}
         isAdding={isAdding}
