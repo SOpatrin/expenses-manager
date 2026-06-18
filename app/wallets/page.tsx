@@ -13,8 +13,6 @@ import { createWalletAction } from './actions'
 
 const pulse = 'animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800'
 
-export const unstable_instant = { prefetch: 'static' }
-
 export default function WalletsPage() {
   return (
     <main className="mx-auto w-full max-w-lg px-4 py-8">

@@ -17,8 +17,6 @@ import { DeleteWalletButton } from '../../wallets/_components/DeleteWalletButton
 
 const pulse = 'animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800'
 
-export const unstable_instant = { prefetch: 'static' }
-
 export default function WalletPage({
   params,
 }: {
