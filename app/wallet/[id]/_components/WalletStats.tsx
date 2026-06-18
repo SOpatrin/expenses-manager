@@ -1,6 +1,6 @@
 'use client'
 
-import { useLocalStorage } from '@/app/_hooks/useLocalStorage'
+import { useCookieState } from '@/app/_hooks/useCookieState'
 import { SUPPORTED_CURRENCIES } from '@/lib/rates'
 import {
   computeStats,
@@ -60,10 +60,8 @@ export default function WalletStats({
   transactions: Transaction[]
   rates: Record<string, number>
 }) {
-  const [displayCurrency, setDisplayCurrency] = useLocalStorage(
-    'display-currency',
-    '',
-  )
+  const [displayCurrency, setDisplayCurrency] =
+    useCookieState('display-currency')
 
   if (transactions.length === 0) return null
 

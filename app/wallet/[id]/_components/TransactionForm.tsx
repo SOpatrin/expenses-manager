@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useLocalStorage } from '@/app/_hooks/useLocalStorage'
+import { useCookieState } from '@/app/_hooks/useCookieState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -22,8 +22,8 @@ export default function TransactionForm({
   addState: AddTransactionState
   isAdding: boolean
 }) {
-  const [currency, setCurrency] = useLocalStorage('tx-currency', 'RSD')
-  const [type, setType] = useLocalStorage('tx-type', 'expense')
+  const [currency, setCurrency] = useCookieState('tx-currency')
+  const [type, setType] = useCookieState('tx-type')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
   const [date, setDate] = useState(today)
@@ -57,9 +57,8 @@ export default function TransactionForm({
           onChange={(e) => setAmount(e.target.value)}
         />
         <NativeSelect
-          key={currency}
           name="currency"
-          defaultValue={currency}
+          value={currency}
           onChange={(e) => setCurrency(e.target.value)}
         >
           <option value="RSD">RSD</option>
@@ -68,9 +67,8 @@ export default function TransactionForm({
           <option value="EUR">EUR</option>
         </NativeSelect>
         <NativeSelect
-          key={type}
           name="type"
-          defaultValue={type}
+          value={type}
           onChange={(e) => setType(e.target.value)}
         >
           <option value="expense">Расход</option>
