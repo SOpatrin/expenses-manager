@@ -41,11 +41,11 @@ export default async function LoginPage({
       : '/'
 
   return (
-    <div className="flex min-h-full flex-1 flex-col items-center justify-center bg-zinc-50">
-      <div className="w-full max-w-sm space-y-6 rounded-xl bg-white p-8 shadow-sm">
+    <div className="bg-background flex min-h-full flex-1 flex-col items-center justify-center">
+      <div className="bg-card w-full max-w-sm space-y-6 rounded-xl p-8 shadow-sm">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">Вход</h1>
-          <p className="mt-1 text-sm text-zinc-500">Expense Tracker</p>
+          <h1 className="text-foreground text-xl font-semibold">Вход</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Expense Tracker</p>
         </div>
 
         <form action={signInWithGoogle.bind(null, safeCallbackUrl)}>
@@ -57,10 +57,10 @@ export default async function LoginPage({
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-200" />
+            <div className="border-border w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2 text-zinc-400">или</span>
+            <span className="bg-card text-muted-foreground px-2">или</span>
           </div>
         </div>
 
@@ -68,11 +68,11 @@ export default async function LoginPage({
           <LoginForm />
         </Suspense>
 
-        <p className="text-center text-sm text-zinc-500">
+        <p className="text-muted-foreground text-center text-sm">
           Ещё нет аккаунта?{' '}
           <Link
             href={`/register${safeCallbackUrl !== '/' ? `?callbackUrl=${safeCallbackUrl}` : ''}`}
-            className="text-zinc-900 underline"
+            className="text-foreground underline"
           >
             Зарегистрироваться
           </Link>
@@ -81,7 +81,7 @@ export default async function LoginPage({
         <form action={signInAsGuest.bind(null, safeCallbackUrl)}>
           <button
             type="submit"
-            className="w-full text-center text-xs text-zinc-400 hover:text-zinc-600"
+            className="text-muted-foreground hover:text-foreground w-full text-center text-xs"
           >
             войти без регистрации
           </button>
