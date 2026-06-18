@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { updateTag } from 'next/cache'
 import { z } from 'zod'
 
 import { signOut } from '@/auth'
@@ -53,7 +53,7 @@ export async function addTransaction(
 
   await createTransaction(userId, walletId, parsed.data)
 
-  revalidatePath(`/wallet/${walletId}`)
+  updateTag(`wallet-${walletId}`)
   return { status: 'success' }
 }
 
@@ -76,7 +76,7 @@ export async function updateTransactionAction(
   if (!parsed.success) return
 
   await updateTransaction(userId, walletId, transactionId, parsed.data)
-  revalidatePath(`/wallet/${walletId}`)
+  updateTag(`wallet-${walletId}`)
 }
 
 export async function renameWalletAction(
@@ -85,7 +85,8 @@ export async function renameWalletAction(
 ): Promise<void> {
   const userId = await requireUserId()
   await renameWallet(userId, walletId, name.trim())
-  revalidatePath(`/wallet/${walletId}`)
+  updateTag(`wallet-meta-${walletId}`)
+  updateTag(`user-wallets-${userId}`)
 }
 
 export async function removeWalletMemberAction(
@@ -94,7 +95,7 @@ export async function removeWalletMemberAction(
 ): Promise<void> {
   const userId = await requireUserId()
   await removeWalletMember(userId, walletId, targetUserId)
-  revalidatePath(`/wallet/${walletId}/settings`)
+  updateTag(`wallet-members-${walletId}`)
 }
 
 export async function signOutAction(): Promise<void> {
@@ -146,5 +147,5 @@ export async function deleteTransactionAction(
   const userId = await requireUserId()
 
   await deleteTransaction(userId, walletId, transactionId)
-  revalidatePath(`/wallet/${walletId}`)
+  updateTag(`wallet-${walletId}`)
 }

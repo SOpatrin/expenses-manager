@@ -1,6 +1,12 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
+  experimental: {
+    staleTimes: {
+      dynamic: 300,
+    },
+  },
   allowedDevOrigins: ['192.168.0.17'],
   async headers() {
     return [

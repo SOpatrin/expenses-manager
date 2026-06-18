@@ -1,6 +1,14 @@
 'use client'
 
-import { useState, useActionState, useOptimistic, useTransition } from 'react'
+import {
+  startTransition,
+  useActionState,
+  useLayoutEffect,
+  useOptimistic,
+  useRef,
+  useState,
+  useTransition,
+} from 'react'
 import { DEV_USER_ID } from '@/app/_dev'
 import type { Transaction } from '@/lib/transactions'
 import {
@@ -67,11 +75,32 @@ export function useTransactions(
 
   const [addState, submitAdd, isAdding] = useActionState<
     AddTransactionState,
-    FormData
-  >(addTransaction.bind(null, walletId), { status: 'idle' })
+    FormData | 'reset'
+  >(
+    async (prevState, payload) => {
+      // 'reset' приходит из cleanup при скрытии страницы через <Activity>.
+      if (payload === 'reset') return { status: 'idle' }
+      return addTransaction(walletId, prevState, payload)
+    },
+    { status: 'idle' },
+  )
+
+  // <Activity> сохраняет инстанс формы между навигациями: без сброса прошлый
+  // success/error из addState «залипает» и снова виден при возврате на страницу.
+  // Помечаем, что был сабмит, и чистим состояние при скрытии компонента.
+  const shouldResetAddState = useRef(false)
+  useLayoutEffect(() => {
+    return () => {
+      if (shouldResetAddState.current) {
+        shouldResetAddState.current = false
+        startTransition(() => submitAdd('reset'))
+      }
+    }
+  }, [submitAdd])
 
   function handleSubmit(formData: FormData) {
     updateOptimistic({ type: 'add', formData })
+    shouldResetAddState.current = true
     submitAdd(formData)
   }
 
