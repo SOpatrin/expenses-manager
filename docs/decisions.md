@@ -130,6 +130,15 @@
 - Лимит сканирований хранится в БД (`receipt_scan_limit` на юзера, default 5/день) — консольный spending limit Anthropic слишком грубый.
 - Клиентское сжатие: Canvas API, max 1200px по длинной стороне, JPEG 85%.
 
+## Persistence UI-предпочтений: cookie, не localStorage
+
+- Валюта и тип транзакции, валюта отображения хранятся в cookie, а не в localStorage.
+- Проблема localStorage: сервер его не видит → SSR рендерит дефолт → браузер красит дефолтный HTML до гидрации → видимая вспышка при переключении на сохранённое значение. Клиентские приёмы (lazy-init `useState`, `useLayoutEffect`, `dynamic ssr:false`) не лечат: серверный HTML первичен, а `ssr:false` ещё и ломает скелетоны (pop-in).
+- Cookie уходит с HTTP-запросом → сервер читает её в `WalletBody` и засевает `CookiesProvider` → первый же рендер (в т.ч. серверный рендер клиентского компонента) корректный, без вспышки.
+- Whitelist через явные `.get()` по трём именам, не `getAll()`: `cookies()` на сервере читает и httpOnly-cookie, поэтому `getAll()` протащил бы сессионный токен Auth.js в клиентский контекст (RSC-пейлоад + `document.cookie`-доступ) — утечка.
+- `useCookieState` построен на контексте (React 19: `<Context>` как провайдер без `.Provider`, `use()` вместо `useContext`). Провайдер навешивается серверным `WalletBody` снаружи `WalletView`, поэтому начальное значение не пробрасывается пропами через дерево — листья читают из контекста.
+- Тема осталась на localStorage: там вспышки нет — класс `dark` вешает inline-скрипт в `layout.tsx` до отрисовки.
+
 ## Миграции в build
 
 - `drizzle-kit migrate && next build` — миграции применяются перед каждым деплоем на Vercel.
