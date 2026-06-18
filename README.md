@@ -21,6 +21,7 @@
 - Вход через Google, email + пароль или без регистрации
 - Swipe-to-delete на мобильном
 - PWA — офлайн-фолбэк из кеша
+- **Сканирование чеков** — фото → Claude Vision → автозаполнение формы (HEIC/JPEG/PNG/WebP)
 
 ## Запуск
 
@@ -29,15 +30,7 @@ pnpm install
 pnpm dev   # HTTPS обязателен для SW и secure cookies
 ```
 
-`.env.local`:
-
-```
-DATABASE_URL=
-AUTH_SECRET=
-AUTH_GOOGLE_ID=
-AUTH_GOOGLE_SECRET=
-AUTH_RESEND_KEY=
-```
+Скопируй `.env` в `.env.local` и заполни значения.
 
 ## Команды
 
