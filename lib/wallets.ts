@@ -1,7 +1,7 @@
 import { and, eq } from 'drizzle-orm'
 
 import { db } from './db'
-import { transactions, users, walletMembers, wallets } from './schema'
+import { users, walletMembers, wallets } from './schema'
 
 export type WalletMember = {
   userId: string
@@ -81,8 +81,7 @@ export async function deleteWallet(
   if (!member || member.role !== 'owner')
     throw new Error('Only owner can delete wallet')
 
-  await db.delete(transactions).where(eq(transactions.walletId, walletId))
-  await db.delete(walletMembers).where(eq(walletMembers.walletId, walletId))
+  // ON DELETE CASCADE на FK walletMembers/transactions удалит связанные строки
   await db.delete(wallets).where(eq(wallets.id, walletId))
 }
 

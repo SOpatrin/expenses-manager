@@ -2,10 +2,12 @@ import { eq } from 'drizzle-orm'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { db } from './db'
-import { users, walletMembers, wallets } from './schema'
+import { transactions, users, walletMembers, wallets } from './schema'
+import { createTransaction } from './transactions'
 import {
   addWalletMember,
   createWallet,
+  deleteWallet,
   getFirstWallet,
   getWallet,
   getWalletMembers,
@@ -114,6 +116,44 @@ describe('createWallet', () => {
 
     expect(member.userId).toBe(TEST_USER_ID)
     expect(member.role).toBe('owner')
+  })
+})
+
+describe('deleteWallet', () => {
+  it('owner удаляет кошелёк вместе с участниками и транзакциями (каскад)', async () => {
+    const wallet = await createWallet(TEST_USER_ID, 'На удаление')
+    await addWalletMember(wallet.id, TEST_GUEST_ID)
+    await createTransaction(TEST_USER_ID, wallet.id, {
+      amount: 100,
+      currency: 'RSD',
+      type: 'expense',
+      date: '2024-01-15',
+    })
+
+    await deleteWallet(TEST_USER_ID, wallet.id)
+
+    const [w] = await db.select().from(wallets).where(eq(wallets.id, wallet.id))
+    expect(w).toBeUndefined()
+
+    const members = await db
+      .select()
+      .from(walletMembers)
+      .where(eq(walletMembers.walletId, wallet.id))
+    expect(members).toHaveLength(0)
+
+    const txs = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.walletId, wallet.id))
+    expect(txs).toHaveLength(0)
+  })
+
+  it('бросает ошибку если вызывает не owner', async () => {
+    const wallet = await createWallet(TEST_USER_ID, 'Чужой')
+    await addWalletMember(wallet.id, TEST_GUEST_ID)
+    await expect(deleteWallet(TEST_GUEST_ID, wallet.id)).rejects.toThrow(
+      'Only owner can delete wallet',
+    )
   })
 })
 

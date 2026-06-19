@@ -126,7 +126,7 @@ export const transactions = pgTable('transactions', {
   id: uuid('id').defaultRandom().primaryKey(),
   walletId: uuid('wallet_id')
     .notNull()
-    .references(() => wallets.id),
+    .references(() => wallets.id, { onDelete: 'cascade' }),
   createdBy: text('created_by').notNull(),
   amount: money('amount').notNull(),
   currency: text('currency').notNull().default('RUB'),

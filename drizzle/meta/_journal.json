@@ -50,6 +50,13 @@
       "when": 1781736127821,
       "tag": "0006_brainy_selene",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781889762492,
+      "tag": "0007_exotic_sue_storm",
+      "breakpoints": true
     }
   ]
 }
