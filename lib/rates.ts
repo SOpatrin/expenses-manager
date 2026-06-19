@@ -1,6 +1,3 @@
-export const SUPPORTED_CURRENCIES = ['RUB', 'USD', 'EUR', 'RSD'] as const
-export type Currency = (typeof SUPPORTED_CURRENCIES)[number]
-
 type ExchangeRateResponse = {
   result: string
   conversion_rates: Record<string, number>

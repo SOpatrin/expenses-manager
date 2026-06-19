@@ -1,7 +1,7 @@
 'use client'
 
 import { useCookieState } from '@/app/_hooks/useCookieState'
-import { SUPPORTED_CURRENCIES } from '@/lib/rates'
+import { CURRENCIES } from '@/lib/currencies'
 import {
   computeStats,
   computeUnifiedStats,
@@ -65,7 +65,7 @@ export default function WalletStats({
 
   if (transactions.length === 0) return null
 
-  const availableCurrencies = SUPPORTED_CURRENCIES.filter((c) => c in rates)
+  const availableCurrencies = CURRENCIES.filter((c) => c in rates)
 
   return (
     <div className="flex flex-col gap-3">

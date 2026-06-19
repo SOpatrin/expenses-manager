@@ -79,7 +79,5 @@ Telegram-бот** — поверх него строится и текущий w
 ## Справочники — `lib/currencies.ts`
 
 `CURRENCIES = ['RSD','RUB','USD','EUR']`, `TX_TYPES = ['expense','income']`, `TX_TYPE_LABELS`.
-Единый источник для Zod-схем (`z.enum(CURRENCIES)`) и опций форм.
-
-> Примечание: в `lib/rates.ts` есть свой список `SUPPORTED_CURRENCIES` (тот же набор, другой порядок) —
-> историческая дубль-точка, при случае стоит свести к `CURRENCIES`.
+Единственный источник правды по валютам/типам — для Zod-схем (`z.enum(CURRENCIES)`),
+опций форм и фильтра валют в статистике.
