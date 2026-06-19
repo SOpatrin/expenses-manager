@@ -80,7 +80,17 @@ export function useTransactions(
     async (prevState, payload) => {
       // 'reset' приходит из cleanup при скрытии страницы через <Activity>.
       if (payload === 'reset') return { status: 'idle' }
-      return addTransaction(walletId, prevState, payload)
+      try {
+        const timeout = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 9000),
+        )
+        return await Promise.race([
+          addTransaction(walletId, prevState, payload),
+          timeout,
+        ])
+      } catch {
+        return { status: 'error', message: 'Не удалось сохранить. Попробуй ещё раз.' }
+      }
     },
     { status: 'idle' },
   )
