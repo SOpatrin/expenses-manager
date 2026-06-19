@@ -44,7 +44,13 @@ export default function TransactionForm({
   }
 
   return (
-    <form action={handleAction} className="flex flex-col gap-3">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleAction(new FormData(e.currentTarget))
+      }}
+      className="flex flex-col gap-3"
+    >
       <div className="flex gap-2">
         <Input
           name="amount"

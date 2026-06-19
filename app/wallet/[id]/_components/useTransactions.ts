@@ -99,9 +99,11 @@ export function useTransactions(
   }, [submitAdd])
 
   function handleSubmit(formData: FormData) {
-    updateOptimistic({ type: 'add', formData })
     shouldResetAddState.current = true
-    submitAdd(formData)
+    startTransition(() => {
+      updateOptimistic({ type: 'add', formData })
+      submitAdd(formData)
+    })
   }
 
   function handleDelete(id: string) {
