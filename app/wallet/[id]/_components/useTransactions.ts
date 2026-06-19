@@ -9,6 +9,7 @@ import {
   useState,
   useTransition,
 } from 'react'
+import { toast } from 'sonner'
 import type { Transaction } from '@/lib/transactions'
 import {
   type AddTransactionState,
@@ -122,7 +123,12 @@ export function useTransactions(
   function handleDelete(id: string) {
     startDeleteTransition(async () => {
       updateOptimistic({ type: 'delete', id })
-      await deleteTransactionAction(walletId, id)
+      try {
+        await deleteTransactionAction(walletId, id)
+      } catch {
+        // useOptimistic откатит состояние сам — показываем уведомление
+        toast.error('Не удалось удалить. Попробуй ещё раз.')
+      }
     })
   }
 
@@ -130,7 +136,12 @@ export function useTransactions(
     setEditingId(null)
     startUpdateTransition(async () => {
       updateOptimistic({ type: 'update', id, formData })
-      await updateTransactionAction(walletId, id, formData)
+      try {
+        await updateTransactionAction(walletId, id, formData)
+      } catch {
+        // useOptimistic откатит состояние сам — показываем уведомление
+        toast.error('Не удалось сохранить изменения. Попробуй ещё раз.')
+      }
     })
   }
 

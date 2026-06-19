@@ -73,7 +73,9 @@ export async function updateTransactionAction(
     date: formData.get('date'),
   })
 
-  if (!parsed.success) return
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0].message)
+  }
 
   await updateTransaction(userId, walletId, transactionId, parsed.data)
   updateTag(`wallet-${walletId}`)
