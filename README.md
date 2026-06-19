@@ -30,7 +30,16 @@ pnpm install
 pnpm dev   # HTTPS обязателен для SW и secure cookies
 ```
 
-Скопируй `.env` в `.env.local` и заполни значения.
+Создай `.env.local` (gitignored) и заполни переменные:
+
+| Переменная                              | Назначение                                    |
+| --------------------------------------- | --------------------------------------------- |
+| `DATABASE_URL`                          | PostgreSQL (Neon)                             |
+| `AUTH_SECRET`                           | Подпись JWT-сессий Auth.js                    |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth                                  |
+| `EXCHANGERATE_API_KEY`                  | Курсы валют                                   |
+| `ANTHROPIC_API_KEY`                     | Сканирование чеков (Claude Vision)            |
+| `RESEND_API_KEY`                        | Email (зарезервировано, пока не используется) |
 
 ## Команды
 
@@ -46,10 +55,18 @@ pnpm dev   # HTTPS обязателен для SW и secure cookies
 ## Архитектура
 
 ```
-lib/     — доменная логика, чистые функции
+lib/     — доменная логика, чистые функции (bot-ready ядро)
 app/     — Next App Router: страницы, Server Actions, компоненты
-docs/    — decisions.md, roadmap.md
+docs/    — документация
 ```
 
 - Вся логика работы с данными — в `lib/`, Server Actions — только тонкие обёртки
 - `userId` всегда из сессии Auth.js, передаётся явно
+- Транзакции принадлежат **кошельку** (`wallet_members` с ролями owner/member), не юзеру → готово к шарингу
+
+Подробнее:
+
+- [docs/architecture.md](./docs/architecture.md) — карта кода: слои, data flow, кэш-теги, модель данных
+- [docs/lib-api.md](./docs/lib-api.md) — публичный контракт ядра `lib/` (для будущего бота)
+- [docs/decisions.md](./docs/decisions.md) — лог архитектурных решений («почему»)
+- [docs/roadmap.md](./docs/roadmap.md) — план развития
