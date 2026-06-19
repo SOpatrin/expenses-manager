@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
+import { CURRENCIES, TX_TYPES, TX_TYPE_LABELS } from '@/lib/currencies'
 import type { Transaction } from '@/lib/transactions'
 
 export function InlineEditForm({
@@ -34,14 +35,18 @@ export function InlineEditForm({
           defaultValue={t.currency}
           className="py-1.5"
         >
-          <option value="RSD">RSD</option>
-          <option value="RUB">RUB</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
+          {CURRENCIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </NativeSelect>
         <NativeSelect name="type" defaultValue={t.type} className="py-1.5">
-          <option value="expense">Расход</option>
-          <option value="income">Доход</option>
+          {TX_TYPES.map((ty) => (
+            <option key={ty} value={ty}>
+              {TX_TYPE_LABELS[ty]}
+            </option>
+          ))}
         </NativeSelect>
       </div>
       <div className="flex gap-2">

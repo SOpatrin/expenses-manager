@@ -1,9 +1,11 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 
+import { CURRENCIES, type Currency, TX_TYPES } from './currencies'
+
 export type ReceiptDraft = {
   amount: number
-  currency: 'RSD' | 'RUB' | 'USD' | 'EUR'
+  currency: Currency
   type: 'expense' | 'income'
   category: string
   date: string
@@ -11,8 +13,8 @@ export type ReceiptDraft = {
 
 const ReceiptDraftSchema = z.object({
   amount: z.number().positive(),
-  currency: z.enum(['RSD', 'RUB', 'USD', 'EUR']),
-  type: z.enum(['expense', 'income']),
+  currency: z.enum(CURRENCIES),
+  type: z.enum(TX_TYPES),
   category: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 })
@@ -21,7 +23,6 @@ const client = new Anthropic()
 
 export async function parseReceiptImage(
   imageDataUrl: string,
-  _userId: string,
 ): Promise<ReceiptDraft> {
   const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/)
   if (!match) throw new Error('Неверный формат изображения')

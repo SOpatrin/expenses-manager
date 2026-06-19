@@ -5,6 +5,7 @@ import { useCookieState } from '@/app/_hooks/useCookieState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
+import { CURRENCIES, TX_TYPES, TX_TYPE_LABELS } from '@/lib/currencies'
 import type { ReceiptDraft } from '@/lib/receipts'
 import type { AddTransactionState } from '../actions'
 import ReceiptScanButton from './ReceiptScanButton'
@@ -67,18 +68,22 @@ export default function TransactionForm({
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
         >
-          <option value="RSD">RSD</option>
-          <option value="RUB">RUB</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
+          {CURRENCIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </NativeSelect>
         <NativeSelect
           name="type"
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
-          <option value="expense">Расход</option>
-          <option value="income">Доход</option>
+          {TX_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {TX_TYPE_LABELS[t]}
+            </option>
+          ))}
         </NativeSelect>
       </div>
 

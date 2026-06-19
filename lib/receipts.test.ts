@@ -34,7 +34,7 @@ describe('parseReceiptImage', () => {
       ),
     )
 
-    const result = await parseReceiptImage(VALID_DATA_URL, 'user-1')
+    const result = await parseReceiptImage(VALID_DATA_URL)
 
     expect(result).toEqual({
       amount: 450.5,
@@ -48,7 +48,7 @@ describe('parseReceiptImage', () => {
   it('throws on invalid JSON response', async () => {
     mockCreate.mockResolvedValueOnce(makeResponse('not json'))
 
-    await expect(parseReceiptImage(VALID_DATA_URL, 'user-1')).rejects.toThrow(
+    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toThrow(
       'Не удалось распознать чек',
     )
   })
@@ -58,13 +58,13 @@ describe('parseReceiptImage', () => {
       makeResponse(JSON.stringify({ amount: -10, currency: 'RUB' })),
     )
 
-    await expect(parseReceiptImage(VALID_DATA_URL, 'user-1')).rejects.toThrow(
+    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toThrow(
       'Не удалось распознать чек',
     )
   })
 
   it('throws on invalid data URL format', async () => {
-    await expect(parseReceiptImage('not-a-data-url', 'user-1')).rejects.toThrow(
+    await expect(parseReceiptImage('not-a-data-url')).rejects.toThrow(
       'Неверный формат изображения',
     )
   })

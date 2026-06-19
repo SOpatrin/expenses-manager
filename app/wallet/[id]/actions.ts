@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { signOut } from '@/auth'
 import { requireUserId } from '@/app/_session'
+import { CURRENCIES, TX_TYPES } from '@/lib/currencies'
 import { checkAndIncrementScanLimit } from '@/lib/receipt-limits'
 import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
 import {
@@ -19,8 +20,8 @@ const schema = z.object({
     (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
     z.coerce.number().positive(),
   ),
-  currency: z.enum(['RSD', 'RUB', 'USD', 'EUR']),
-  type: z.enum(['income', 'expense']),
+  currency: z.enum(CURRENCIES),
+  type: z.enum(TX_TYPES),
   category: z.string().optional(),
   description: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -135,7 +136,7 @@ export async function scanReceiptAction(
   }
 
   try {
-    const data = await parseReceiptImage(image, userId)
+    const data = await parseReceiptImage(image)
     return { status: 'success', data }
   } catch {
     return { status: 'error', message: 'Не удалось распознать чек' }
