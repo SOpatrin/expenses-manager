@@ -3,6 +3,7 @@
 import {
   startTransition,
   useActionState,
+  useEffect,
   useLayoutEffect,
   useOptimistic,
   useRef,
@@ -18,9 +19,11 @@ import {
   updateTransactionAction,
 } from '../actions'
 
+// Окно отмены удаления (мс): строка скрыта локально, реальный delete уходит после.
+const UNDO_DELETE_MS = 5000
+
 type OptimisticAction =
   | { type: 'add'; formData: FormData }
-  | { type: 'delete'; id: string }
   | { type: 'update'; id: string; formData: FormData }
 
 export function useTransactions(
@@ -32,12 +35,15 @@ export function useTransactions(
   const [isDeleting, startDeleteTransition] = useTransition()
   const [isUpdating, startUpdateTransition] = useTransition()
 
+  // Удаления в окне отмены: id скрыты из списка, но ещё не ушли на сервер.
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(
+    new Set(),
+  )
+  const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>())
+
   const [optimisticTransactions, updateOptimistic] = useOptimistic(
     initialTransactions,
     (state: Transaction[], action: OptimisticAction) => {
-      if (action.type === 'delete') {
-        return state.filter((t) => t.id !== action.id)
-      }
       if (action.type === 'update') {
         return state.map((t) =>
           t.id === action.id
@@ -112,6 +118,20 @@ export function useTransactions(
     }
   }, [submitAdd])
 
+  // При реальном уходе с роута (не <Activity>-скрытии) добиваем удаления,
+  // по которым окно отмены ещё не истекло, чтобы они не потерялись.
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      for (const [id, timer] of timers) {
+        clearTimeout(timer)
+        // Компонент уходит — тостить ошибку некому, молча проглатываем.
+        void deleteTransactionAction(walletId, id).catch(() => {})
+      }
+      timers.clear()
+    }
+  }, [walletId])
+
   function handleSubmit(formData: FormData) {
     shouldResetAddState.current = true
     startTransition(() => {
@@ -120,15 +140,50 @@ export function useTransactions(
     })
   }
 
-  function handleDelete(id: string) {
+  function commitDelete(id: string) {
+    // Гонка: таймер мог сработать в тот же тик, что и нажатие «Отменить».
+    // clearTimeout для уже сработавшего таймера — no-op, поэтому cancelDelete
+    // убирает id из map, а здесь проверяем: нет id — удаление отменено, выходим.
+    if (!timersRef.current.has(id)) return
+    timersRef.current.delete(id)
     startDeleteTransition(async () => {
-      updateOptimistic({ type: 'delete', id })
       try {
         await deleteTransactionAction(walletId, id)
       } catch {
-        // useOptimistic откатит состояние сам — показываем уведомление
         toast.error('Не удалось удалить. Попробуй ещё раз.')
+      } finally {
+        // Успех: сервер уже отдал список без строки. Ошибка: строка вернётся.
+        setPendingDeleteIds((prev) => {
+          const next = new Set(prev)
+          next.delete(id)
+          return next
+        })
       }
+    })
+  }
+
+  function cancelDelete(id: string) {
+    const timer = timersRef.current.get(id)
+    if (timer) clearTimeout(timer)
+    timersRef.current.delete(id)
+    setPendingDeleteIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }
+
+  function handleDelete(id: string) {
+    // Строка исчезает мгновенно, реальный delete — после окна отмены.
+    const label =
+      optimisticTransactions.find((t) => t.id === id)?.category ??
+      'Без категории'
+    setPendingDeleteIds((prev) => new Set(prev).add(id))
+    const timer = setTimeout(() => commitDelete(id), UNDO_DELETE_MS)
+    timersRef.current.set(id, timer)
+    toast(`Удалили «${label}»`, {
+      duration: UNDO_DELETE_MS,
+      action: { label: 'Отменить', onClick: () => cancelDelete(id) },
     })
   }
 
@@ -145,8 +200,13 @@ export function useTransactions(
     })
   }
 
+  // Скрываем строки, по которым идёт окно отмены / запрос на удаление.
+  const visibleTransactions = optimisticTransactions.filter(
+    (t) => !pendingDeleteIds.has(t.id),
+  )
+
   return {
-    optimisticTransactions,
+    optimisticTransactions: visibleTransactions,
     addState,
     isAdding,
     isDeleting,
