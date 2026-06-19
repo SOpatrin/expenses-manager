@@ -3,7 +3,7 @@
 import { updateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { acceptInvite, createInvite, revokeInvite } from '@/lib/invites'
 
 export async function createInviteAction(

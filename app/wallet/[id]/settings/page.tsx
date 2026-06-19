@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
-import { requireUser } from '@/lib/auth'
+import { requireUser } from '@/app/_session'
 import { getWalletInvites } from '@/lib/invites'
 import { getWallet, getWalletMembers, type WalletMember } from '@/lib/wallets'
 

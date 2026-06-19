@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { updateTag } from 'next/cache'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { createWallet, deleteWallet } from '@/lib/wallets'
 
 export async function createWalletAction(formData: FormData): Promise<void> {

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { createWallet, getWallets } from '@/lib/wallets'
 
 export default async function Home() {

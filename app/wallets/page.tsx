@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from 'next/cache'
 import { ThemeToggle } from '@/app/_components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { getWallets, type Wallet } from '@/lib/wallets'
 
 import { signOutAction } from '../wallet/[id]/actions'

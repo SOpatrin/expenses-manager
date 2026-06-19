@@ -4,7 +4,7 @@ import { updateTag } from 'next/cache'
 import { z } from 'zod'
 
 import { signOut } from '@/auth'
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { checkAndIncrementScanLimit } from '@/lib/receipt-limits'
 import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
 import {

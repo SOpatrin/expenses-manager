@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
 import { CookiesProvider } from '@/app/_hooks/useCookieState'
-import { requireUser } from '@/lib/auth'
+import { requireUser } from '@/app/_session'
 import { getRates } from '@/lib/rates'
 import { getTransactions } from '@/lib/transactions'
 import { getWallet } from '@/lib/wallets'

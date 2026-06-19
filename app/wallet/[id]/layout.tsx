@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
-import { requireUserId } from '@/lib/auth'
+import { requireUserId } from '@/app/_session'
 import { getWallets } from '@/lib/wallets'
 
 import { WalletSidebar } from './_components/WalletSidebar'
