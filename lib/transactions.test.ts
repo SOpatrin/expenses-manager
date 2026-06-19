@@ -2,7 +2,11 @@ import { eq } from 'drizzle-orm'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { db } from './db'
 import { transactions, users, walletMembers, wallets } from './schema'
-import { createTransaction, getTransactions } from './transactions'
+import {
+  createTransaction,
+  getTransactions,
+  updateTransaction,
+} from './transactions'
 
 const TEST_USER_ID = 'test-user-transactions'
 
@@ -88,6 +92,16 @@ describe('transactions', () => {
       await expect(getTransactions('stranger', walletId)).rejects.toThrow(
         'Access denied',
       )
+    })
+  })
+
+  describe('updateTransaction', () => {
+    it('бросает ошибку если транзакция не найдена', async () => {
+      await expect(
+        updateTransaction(TEST_USER_ID, walletId, crypto.randomUUID(), {
+          amount: 999,
+        }),
+      ).rejects.toThrow('Transaction not found or access denied')
     })
   })
 })

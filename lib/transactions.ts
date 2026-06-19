@@ -78,6 +78,8 @@ export async function updateTransaction(
     )
     .returning()
 
+  if (!transaction) throw new Error('Transaction not found or access denied')
+
   return transaction
 }
 
