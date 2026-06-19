@@ -9,7 +9,6 @@ import {
   useState,
   useTransition,
 } from 'react'
-import { DEV_USER_ID } from '@/app/_dev'
 import type { Transaction } from '@/lib/transactions'
 import {
   type AddTransactionState,
@@ -26,6 +25,7 @@ type OptimisticAction =
 export function useTransactions(
   walletId: string,
   initialTransactions: Transaction[],
+  currentUserId: string,
 ) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isDeleting, startDeleteTransition] = useTransition()
@@ -57,7 +57,7 @@ export function useTransactions(
       const optimistic: Transaction = {
         id: crypto.randomUUID(),
         walletId,
-        createdBy: DEV_USER_ID,
+        createdBy: currentUserId,
         amount: Number(
           String(action.formData.get('amount') ?? '').replace(',', '.'),
         ),
@@ -89,7 +89,10 @@ export function useTransactions(
           timeout,
         ])
       } catch {
-        return { status: 'error', message: 'Не удалось сохранить. Попробуй ещё раз.' }
+        return {
+          status: 'error',
+          message: 'Не удалось сохранить. Попробуй ещё раз.',
+        }
       }
     },
     { status: 'idle' },

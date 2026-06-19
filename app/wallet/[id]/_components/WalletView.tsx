@@ -8,10 +8,12 @@ import { useTransactions } from './useTransactions'
 
 export default function WalletView({
   walletId,
+  currentUserId,
   initialTransactions,
   rates,
 }: {
   walletId: string
+  currentUserId: string
   initialTransactions: Transaction[]
   rates: Record<string, number>
 }) {
@@ -27,7 +29,7 @@ export default function WalletView({
     handleEdit,
     handleCancelEdit,
     handleUpdate,
-  } = useTransactions(walletId, initialTransactions)
+  } = useTransactions(walletId, initialTransactions, currentUserId)
 
   return (
     <div className="flex flex-col gap-6">

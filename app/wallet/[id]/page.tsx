@@ -96,6 +96,7 @@ async function WalletBody({ params }: { params: Promise<{ id: string }> }) {
     >
       <WalletView
         walletId={id}
+        currentUserId={userId}
         initialTransactions={transactions}
         rates={rates}
       />
