@@ -107,7 +107,7 @@ export default function TransactionForm({
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="">Категория: авто</option>
+          <option value="">🏷️ Авто</option>
           {CATEGORIES.map((c) => (
             <option key={c.key} value={c.key}>
               {c.icon} {c.label}

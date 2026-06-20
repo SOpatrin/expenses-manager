@@ -77,15 +77,15 @@ export default function TransactionList({
                       const cat = getCategory(t.category ?? '')
                       return cat ? `${cat.icon} ${cat.label} · ` : ''
                     })()}
-                    {t.date}
+                    <span className="whitespace-nowrap">{t.date}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span
                     className={
                       t.type === 'income'
-                        ? 'text-sm font-semibold text-emerald-600'
-                        : 'text-sm font-semibold text-red-500'
+                        ? 'text-sm font-semibold whitespace-nowrap text-emerald-600'
+                        : 'text-sm font-semibold whitespace-nowrap text-red-500'
                     }
                   >
                     {formatAmount(t.amount, t.type, t.currency)}

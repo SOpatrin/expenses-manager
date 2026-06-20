@@ -38,10 +38,11 @@ export default function WalletView({
     handleUpdate,
   } = useTransactions(walletId, initialTransactions, currentUserId)
 
+  const today = new Date().toISOString().split('T')[0]
   const [period, setPeriod] = useState<Period>('all')
   const [type, setType] = useState<TxType | ''>('')
   const [category, setCategory] = useState<CategoryKey | ''>('')
-  const [custom, setCustom] = useState<CustomRange>({ from: '', to: '' })
+  const [custom, setCustom] = useState<CustomRange>({ from: today, to: today })
   const [tab, setTab] = useState<'list' | 'analytics'>('list')
 
   const filtered = useMemo(() => {
@@ -55,8 +56,6 @@ export default function WalletView({
       ...range,
     })
   }, [optimisticTransactions, period, type, category, custom])
-
-  const granularity = period === 'all' || period === 'quarter' ? 'month' : 'day'
 
   const renderList = (txs: Transaction[]) => (
     <TransactionList
@@ -123,7 +122,9 @@ export default function WalletView({
           <Analytics
             transactions={filtered}
             rates={rates}
-            granularity={granularity}
+            type={type}
+            activeCategory={category}
+            onCategoryChange={setCategory}
           />
           {renderList(filtered)}
         </>

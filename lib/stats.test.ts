@@ -91,6 +91,17 @@ describe('groupByCategory', () => {
     const result = groupByCategory(txs, RATES, 'USD')
     expect(result[0].total).toBeCloseTo(1)
   })
+
+  it('может группировать доходы вместо расходов', () => {
+    const txs = [
+      tx(100, 'USD', 'income', { category: 'salary' }),
+      tx(50, 'USD', 'expense', { category: 'food' }),
+    ]
+    const result = groupByCategory(txs, undefined, undefined, 'income')
+    expect(result).toEqual([
+      { key: 'salary', label: 'Зарплата', icon: '💰', total: 100 },
+    ])
+  })
 })
 
 describe('groupByPeriod', () => {

@@ -69,16 +69,17 @@ export type CategorySlice = {
   total: number
 }
 
-// Расходы по категориям (для pie). Неизвестные/пустые → бакет 'other'.
-// Сортировка по убыванию суммы.
+// Суммы по категориям для pie (по умолчанию расходы; можно доходы).
+// Неизвестные/пустые → бакет 'other'. Сортировка по убыванию суммы.
 export function groupByCategory(
   transactions: Transaction[],
   rates?: Record<string, number>,
   targetCurrency?: string,
+  type: 'expense' | 'income' = 'expense',
 ): CategorySlice[] {
   const totals = new Map<string, number>()
   for (const t of transactions) {
-    if (t.type !== 'expense') continue
+    if (t.type !== type) continue
     const key = getCategory(t.category ?? '') ? t.category! : 'other'
     totals.set(key, (totals.get(key) ?? 0) + amountIn(t, rates, targetCurrency))
   }

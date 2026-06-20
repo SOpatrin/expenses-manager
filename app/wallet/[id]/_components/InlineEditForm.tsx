@@ -63,7 +63,7 @@ export function InlineEditForm({
           defaultValue={t.category ?? ''}
           className="w-full py-1.5"
         >
-          <option value="">Категория: авто</option>
+          <option value="">🏷️ Авто</option>
           {CATEGORIES.map((c) => (
             <option key={c.key} value={c.key}>
               {c.icon} {c.label}
