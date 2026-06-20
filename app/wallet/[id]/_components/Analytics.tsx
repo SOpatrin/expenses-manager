@@ -283,22 +283,26 @@ export default function Analytics({
               tickFormatter={(v: number) => shortNum(v)}
             />
             <Tooltip content={<ChartTooltip suffix={suffix} />} />
-            <Line
-              type="monotone"
-              dataKey="income"
-              name="Доход"
-              stroke="#10b981"
-              strokeWidth={2}
-              dot={{ r: 3, strokeWidth: 0, fill: '#10b981' }}
-            />
-            <Line
-              type="monotone"
-              dataKey="expense"
-              name="Расход"
-              stroke="#ef4444"
-              strokeWidth={2}
-              dot={{ r: 3, strokeWidth: 0, fill: '#ef4444' }}
-            />
+            {type !== 'expense' && (
+              <Line
+                type="monotone"
+                dataKey="income"
+                name="Доход"
+                stroke="#10b981"
+                strokeWidth={2}
+                dot={{ r: 3, strokeWidth: 0, fill: '#10b981' }}
+              />
+            )}
+            {type !== 'income' && (
+              <Line
+                type="monotone"
+                dataKey="expense"
+                name="Расход"
+                stroke="#ef4444"
+                strokeWidth={2}
+                dot={{ r: 3, strokeWidth: 0, fill: '#ef4444' }}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       </section>
