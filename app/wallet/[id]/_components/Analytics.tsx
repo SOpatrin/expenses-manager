@@ -189,6 +189,19 @@ export default function Analytics({
         ) : (
           <>
             <div className="relative">
+              {/* Подпись в DOM раньше графика → график и его тултип рисуются
+                  сверху, а сумма видна через прозрачную дырку доната. */}
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span
+                  style={{ fontSize: centerFont }}
+                  className="font-semibold text-zinc-800 tabular-nums dark:text-zinc-100"
+                >
+                  {totalText}
+                </span>
+                {target && (
+                  <span className="text-[11px] text-zinc-400">{target}</span>
+                )}
+              </div>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
@@ -215,17 +228,6 @@ export default function Analytics({
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span
-                  style={{ fontSize: centerFont }}
-                  className="font-semibold text-zinc-800 tabular-nums dark:text-zinc-100"
-                >
-                  {totalText}
-                </span>
-                {target && (
-                  <span className="text-[11px] text-zinc-400">{target}</span>
-                )}
-              </div>
             </div>
             <ul className="flex flex-col gap-1.5 text-sm">
               {byCategory.map((s, i) => (

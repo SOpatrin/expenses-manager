@@ -38,6 +38,18 @@ describe('categories', () => {
       expect(suggestCategory('аптека')).toBe('health')
     })
 
+    it('матчит расширенный словарь (из реальных заметок)', () => {
+      expect(suggestCategory('Пицца')).toBe('food')
+      expect(suggestCategory('Wolt')).toBe('food')
+      expect(suggestCategory('Лидл')).toBe('groceries')
+      expect(suggestCategory('Продукти')).toBe('groceries')
+      expect(suggestCategory('Массаж')).toBe('health')
+      expect(suggestCategory('Танцы')).toBe('fun')
+      expect(suggestCategory('Ютуб премиум')).toBe('fun')
+      expect(suggestCategory('Электроника')).toBe('shopping')
+      expect(suggestCategory('Подписка claude')).toBe('bills')
+    })
+
     it('не зависит от регистра и пробелов', () => {
       expect(suggestCategory('  ЗАРПЛАТА  ')).toBe('salary')
     })
