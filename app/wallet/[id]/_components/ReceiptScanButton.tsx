@@ -86,7 +86,13 @@ export default function ReceiptScanButton({
     { status: 'idle' },
   )
 
+  // Обрабатываем каждый результат скана ровно один раз. Без этого эффект
+  // зацикливается: onScanSuccess пересоздаётся на каждом рендере родителя, а
+  // scanState остаётся 'success' → эффект перезапускается и снова сетит стейт.
+  const handledRef = useRef<ScanReceiptState | null>(null)
   useEffect(() => {
+    if (handledRef.current === scanState) return
+    handledRef.current = scanState
     if (scanState.status === 'success') {
       onScanSuccess(scanState.data)
     } else if (scanState.status === 'error') {
