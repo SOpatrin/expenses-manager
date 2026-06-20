@@ -6,6 +6,7 @@ import type { TxType } from '@/lib/currencies'
 import { filterTransactions } from '@/lib/filters'
 import { getPeriodRange, type Period } from '@/lib/periods'
 import type { Transaction } from '@/lib/transactions'
+import Analytics from './Analytics'
 import FilterBar, { type CustomRange } from './FilterBar'
 import TransactionForm from './TransactionForm'
 import TransactionList from './TransactionList'
@@ -41,6 +42,7 @@ export default function WalletView({
   const [type, setType] = useState<TxType | ''>('')
   const [category, setCategory] = useState<CategoryKey | ''>('')
   const [custom, setCustom] = useState<CustomRange>({ from: '', to: '' })
+  const [tab, setTab] = useState<'list' | 'analytics'>('list')
 
   const filtered = useMemo(() => {
     const range =
@@ -53,6 +55,8 @@ export default function WalletView({
       ...range,
     })
   }, [optimisticTransactions, period, type, category, custom])
+
+  const granularity = period === 'all' || period === 'quarter' ? 'month' : 'day'
 
   return (
     <div className="flex flex-col gap-6">
@@ -73,16 +77,44 @@ export default function WalletView({
         custom={custom}
         onCustomChange={setCustom}
       />
-      <TransactionList
-        transactions={filtered}
-        onDelete={handleDelete}
-        isDeleting={isDeleting}
-        editingId={editingId}
-        onEdit={handleEdit}
-        onUpdate={handleUpdate}
-        onCancelEdit={handleCancelEdit}
-        isUpdating={isUpdating}
-      />
+      <div className="flex gap-1.5">
+        {(['list', 'analytics'] as const).map((t) => {
+          const active = tab === t
+          return (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                active
+                  ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
+                  : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
+              }`}
+            >
+              {t === 'list' ? 'Список' : 'Аналитика'}
+            </button>
+          )
+        })}
+      </div>
+
+      {tab === 'list' ? (
+        <TransactionList
+          transactions={filtered}
+          onDelete={handleDelete}
+          isDeleting={isDeleting}
+          editingId={editingId}
+          onEdit={handleEdit}
+          onUpdate={handleUpdate}
+          onCancelEdit={handleCancelEdit}
+          isUpdating={isUpdating}
+        />
+      ) : (
+        <Analytics
+          transactions={filtered}
+          rates={rates}
+          granularity={granularity}
+        />
+      )}
     </div>
   )
 }
