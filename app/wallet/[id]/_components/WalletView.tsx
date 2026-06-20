@@ -73,7 +73,10 @@ export default function WalletView({
 
   return (
     <div className="flex flex-col gap-6">
-      <WalletStats transactions={optimisticTransactions} rates={rates} />
+      <WalletStats
+        transactions={tab === 'analytics' ? filtered : optimisticTransactions}
+        rates={rates}
+      />
 
       <div className="flex gap-1.5">
         {(['list', 'analytics'] as const).map((t) => {
