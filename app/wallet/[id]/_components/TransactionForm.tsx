@@ -5,7 +5,7 @@ import { useCookieState } from '@/app/_hooks/useCookieState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
-import { CATEGORIES, suggestCategory } from '@/lib/categories'
+import { CATEGORIES } from '@/lib/categories'
 import { CURRENCIES, TX_TYPES, TX_TYPE_LABELS } from '@/lib/currencies'
 import type { ReceiptDraft } from '@/lib/receipts'
 import type { AddTransactionState } from '../actions'
@@ -33,8 +33,8 @@ export default function TransactionForm({
 
   function handleScanSuccess(draft: ReceiptDraft) {
     setAmount(String(draft.amount))
-    setCategory(suggestCategory(draft.category))
-    setDescription(draft.category)
+    setCategory(draft.category)
+    setDescription(draft.description)
     setDate(draft.date)
     setCurrency(draft.currency)
     setType(draft.type)

@@ -21,14 +21,15 @@ function makeResponse(text: string) {
 }
 
 describe('parseReceiptImage', () => {
-  it('returns ReceiptDraft on valid response', async () => {
+  it('returns ReceiptDraft on valid response (ключ категории + заметка)', async () => {
     mockCreate.mockResolvedValueOnce(
       makeResponse(
         JSON.stringify({
           amount: 450.5,
           currency: 'RUB',
           type: 'expense',
-          category: 'Продукты',
+          category: 'groceries',
+          description: 'Лидл',
           date: '2024-03-15',
         }),
       ),
@@ -40,9 +41,30 @@ describe('parseReceiptImage', () => {
       amount: 450.5,
       currency: 'RUB',
       type: 'expense',
-      category: 'Продукты',
+      category: 'groceries',
+      description: 'Лидл',
       date: '2024-03-15',
     })
+  })
+
+  it('нормализует не-ключевую категорию через suggestCategory', async () => {
+    mockCreate.mockResolvedValueOnce(
+      makeResponse(
+        JSON.stringify({
+          amount: 1200,
+          currency: 'RSD',
+          type: 'expense',
+          category: 'Кафе у моря', // не ключ enum
+          description: 'Кафе у моря',
+          date: '2024-03-15',
+        }),
+      ),
+    )
+
+    const result = await parseReceiptImage(VALID_DATA_URL)
+
+    expect(result.category).toBe('food') // 'кафе' → food
+    expect(result.description).toBe('Кафе у моря')
   })
 
   it('throws on invalid JSON response', async () => {
