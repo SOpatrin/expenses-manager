@@ -58,25 +58,23 @@ export default function WalletView({
 
   const granularity = period === 'all' || period === 'quarter' ? 'month' : 'day'
 
+  const renderList = (txs: Transaction[]) => (
+    <TransactionList
+      transactions={txs}
+      onDelete={handleDelete}
+      isDeleting={isDeleting}
+      editingId={editingId}
+      onEdit={handleEdit}
+      onUpdate={handleUpdate}
+      onCancelEdit={handleCancelEdit}
+      isUpdating={isUpdating}
+    />
+  )
+
   return (
     <div className="flex flex-col gap-6">
-      <WalletStats transactions={filtered} rates={rates} />
-      <TransactionForm
-        walletId={walletId}
-        onSubmit={handleSubmit}
-        addState={addState}
-        isAdding={isAdding}
-      />
-      <FilterBar
-        period={period}
-        onPeriodChange={setPeriod}
-        type={type}
-        onTypeChange={setType}
-        category={category}
-        onCategoryChange={setCategory}
-        custom={custom}
-        onCustomChange={setCustom}
-      />
+      <WalletStats transactions={optimisticTransactions} rates={rates} />
+
       <div className="flex gap-1.5">
         {(['list', 'analytics'] as const).map((t) => {
           const active = tab === t
@@ -98,22 +96,34 @@ export default function WalletView({
       </div>
 
       {tab === 'list' ? (
-        <TransactionList
-          transactions={filtered}
-          onDelete={handleDelete}
-          isDeleting={isDeleting}
-          editingId={editingId}
-          onEdit={handleEdit}
-          onUpdate={handleUpdate}
-          onCancelEdit={handleCancelEdit}
-          isUpdating={isUpdating}
-        />
+        <>
+          <TransactionForm
+            walletId={walletId}
+            onSubmit={handleSubmit}
+            addState={addState}
+            isAdding={isAdding}
+          />
+          {renderList(optimisticTransactions)}
+        </>
       ) : (
-        <Analytics
-          transactions={filtered}
-          rates={rates}
-          granularity={granularity}
-        />
+        <>
+          <FilterBar
+            period={period}
+            onPeriodChange={setPeriod}
+            type={type}
+            onTypeChange={setType}
+            category={category}
+            onCategoryChange={setCategory}
+            custom={custom}
+            onCustomChange={setCustom}
+          />
+          <Analytics
+            transactions={filtered}
+            rates={rates}
+            granularity={granularity}
+          />
+          {renderList(filtered)}
+        </>
       )}
     </div>
   )
