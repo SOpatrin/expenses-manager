@@ -11,6 +11,7 @@ import {
   useTransition,
 } from 'react'
 import { toast } from 'sonner'
+import { type CategoryKey, getCategory } from '@/lib/categories'
 import type { Transaction } from '@/lib/transactions'
 import {
   type AddTransactionState,
@@ -55,7 +56,10 @@ export function useTransactions(
                 currency:
                   (action.formData.get('currency') as string) || t.currency,
                 type: action.formData.get('type') as Transaction['type'],
-                category: (action.formData.get('category') as string) || null,
+                category:
+                  (action.formData.get('category') as CategoryKey) || null,
+                description:
+                  (action.formData.get('description') as string) || null,
                 date: action.formData.get('date') as string,
               }
             : t,
@@ -70,7 +74,7 @@ export function useTransactions(
         ),
         currency: (action.formData.get('currency') as string) || 'RSD',
         type: action.formData.get('type') as Transaction['type'],
-        category: (action.formData.get('category') as string) || null,
+        category: (action.formData.get('category') as CategoryKey) || null,
         description: (action.formData.get('description') as string) || null,
         date: action.formData.get('date') as string,
         createdAt: new Date(),
@@ -175,9 +179,11 @@ export function useTransactions(
 
   function handleDelete(id: string) {
     // Строка исчезает мгновенно, реальный delete — после окна отмены.
+    const deleted = optimisticTransactions.find((t) => t.id === id)
     const label =
-      optimisticTransactions.find((t) => t.id === id)?.category ??
-      'Без категории'
+      deleted?.description ||
+      getCategory(deleted?.category ?? '')?.label ||
+      'запись'
     setPendingDeleteIds((prev) => new Set(prev).add(id))
     const timer = setTimeout(() => commitDelete(id), UNDO_DELETE_MS)
     timersRef.current.set(id, timer)

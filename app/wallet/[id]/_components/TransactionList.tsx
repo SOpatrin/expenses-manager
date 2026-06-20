@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react'
 import { SwipeableRow } from '@/components/ui/swipeable-row'
+import { getCategory } from '@/lib/categories'
 import type { Transaction } from '@/lib/transactions'
 import { InlineEditForm } from './InlineEditForm'
 
@@ -67,16 +68,24 @@ export default function TransactionList({
               >
                 <div className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                    {t.category ?? 'Без категории'}
+                    {t.description ||
+                      getCategory(t.category ?? '')?.label ||
+                      'Без категории'}
                   </span>
-                  <span className="text-xs text-zinc-400">{t.date}</span>
+                  <span className="text-xs text-zinc-400">
+                    {(() => {
+                      const cat = getCategory(t.category ?? '')
+                      return cat ? `${cat.icon} ${cat.label} · ` : ''
+                    })()}
+                    <span className="whitespace-nowrap">{t.date}</span>
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <span
                     className={
                       t.type === 'income'
-                        ? 'text-sm font-semibold text-emerald-600'
-                        : 'text-sm font-semibold text-red-500'
+                        ? 'text-sm font-semibold whitespace-nowrap text-emerald-600'
+                        : 'text-sm font-semibold whitespace-nowrap text-red-500'
                     }
                   >
                     {formatAmount(t.amount, t.type, t.currency)}

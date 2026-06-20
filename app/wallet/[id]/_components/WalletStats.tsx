@@ -38,16 +38,18 @@ function StatCard({
         </span>
       </div>
       <p
-        className={`text-2xl font-semibold ${positive ? 'text-zinc-800 dark:text-zinc-100' : 'text-red-500'}`}
+        className={`text-2xl font-semibold whitespace-nowrap ${positive ? 'text-zinc-800 dark:text-zinc-100' : 'text-red-500'}`}
       >
         {positive ? '+' : ''}
         {fmt(s.balance, currency)}
       </p>
       <div className="mt-3 flex gap-4 text-sm">
-        <span className="text-emerald-600 dark:text-emerald-400">
+        <span className="whitespace-nowrap text-emerald-600 dark:text-emerald-400">
           ↑ {fmt(s.income, currency)}
         </span>
-        <span className="text-red-500">↓ {fmt(s.expense, currency)}</span>
+        <span className="whitespace-nowrap text-red-500">
+          ↓ {fmt(s.expense, currency)}
+        </span>
       </div>
     </div>
   )

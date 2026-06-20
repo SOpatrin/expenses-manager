@@ -1,4 +1,5 @@
 import { and, desc, eq } from 'drizzle-orm'
+import type { CategoryKey } from './categories'
 import { db } from './db'
 import { transactions, walletMembers } from './schema'
 
@@ -6,7 +7,7 @@ export type NewTransaction = {
   amount: number
   currency: string
   type: 'income' | 'expense'
-  category?: string
+  category?: CategoryKey
   description?: string
   date: string // 'YYYY-MM-DD'
 }

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
+import { CATEGORIES } from '@/lib/categories'
 import { CURRENCIES, TX_TYPES, TX_TYPE_LABELS } from '@/lib/currencies'
 import type { Transaction } from '@/lib/transactions'
 
@@ -49,14 +50,26 @@ export function InlineEditForm({
           ))}
         </NativeSelect>
       </div>
+      <Input
+        name="description"
+        type="text"
+        defaultValue={t.description ?? ''}
+        placeholder="Заметка"
+        className="w-full py-1.5"
+      />
       <div className="flex gap-2">
-        <Input
+        <NativeSelect
           name="category"
-          type="text"
           defaultValue={t.category ?? ''}
-          placeholder="Категория"
           className="w-full py-1.5"
-        />
+        >
+          <option value="">🏷️ Авто</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.key} value={c.key}>
+              {c.icon} {c.label}
+            </option>
+          ))}
+        </NativeSelect>
         <Input
           name="date"
           type="date"
