@@ -1,0 +1,2 @@
+CREATE TYPE "public"."category" AS ENUM('food', 'groceries', 'transport', 'home', 'bills', 'health', 'fun', 'shopping', 'travel', 'education', 'gifts', 'salary', 'other');--> statement-breakpoint
+ALTER TABLE "transactions" ALTER COLUMN "category" SET DATA TYPE "public"."category" USING "category"::"public"."category";

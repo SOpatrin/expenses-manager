@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { signOut } from '@/auth'
 import { requireUserId } from '@/app/_session'
+import { CATEGORY_KEYS, suggestCategory } from '@/lib/categories'
 import { CURRENCIES, TX_TYPES } from '@/lib/currencies'
 import { checkAndIncrementScanLimit } from '@/lib/receipt-limits'
 import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
@@ -22,10 +23,18 @@ const schema = z.object({
   ),
   currency: z.enum(CURRENCIES),
   type: z.enum(TX_TYPES),
-  category: z.string().optional(),
+  category: z.enum(CATEGORY_KEYS).optional(),
   description: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 })
+
+// Категория не выбрана явно → выводим из заметки по ключевым словам.
+function withCategory(data: z.infer<typeof schema>) {
+  return {
+    ...data,
+    category: data.category ?? suggestCategory(data.description),
+  }
+}
 
 export type AddTransactionState =
   | { status: 'idle' }
@@ -52,7 +61,7 @@ export async function addTransaction(
     return { status: 'error', message: parsed.error.issues[0].message }
   }
 
-  await createTransaction(userId, walletId, parsed.data)
+  await createTransaction(userId, walletId, withCategory(parsed.data))
 
   updateTag(`wallet-${walletId}`)
   return { status: 'success' }
@@ -78,7 +87,12 @@ export async function updateTransactionAction(
     throw new Error(parsed.error.issues[0].message)
   }
 
-  await updateTransaction(userId, walletId, transactionId, parsed.data)
+  await updateTransaction(
+    userId,
+    walletId,
+    transactionId,
+    withCategory(parsed.data),
+  )
   updateTag(`wallet-${walletId}`)
 }
 

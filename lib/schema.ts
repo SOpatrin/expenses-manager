@@ -11,6 +11,8 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
+import { CATEGORY_KEYS } from './categories'
+
 // хранит копейки в БД, снаружи работаем в рублях
 const money = customType<{ data: number; driverData: number }>({
   dataType() {
@@ -87,6 +89,7 @@ export const transactionTypeEnum = pgEnum('transaction_type', [
   'expense',
 ])
 export const memberRoleEnum = pgEnum('member_role', ['owner', 'member'])
+export const categoryEnum = pgEnum('category', CATEGORY_KEYS)
 
 export const wallets = pgTable('wallets', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -131,7 +134,7 @@ export const transactions = pgTable('transactions', {
   amount: money('amount').notNull(),
   currency: text('currency').notNull().default('RUB'),
   type: transactionTypeEnum('type').notNull(),
-  category: text('category'),
+  category: categoryEnum('category'),
   description: text('description'),
   date: date('date').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),

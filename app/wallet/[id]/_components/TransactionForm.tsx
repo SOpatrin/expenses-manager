@@ -5,6 +5,7 @@ import { useCookieState } from '@/app/_hooks/useCookieState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
+import { CATEGORIES, suggestCategory } from '@/lib/categories'
 import { CURRENCIES, TX_TYPES, TX_TYPE_LABELS } from '@/lib/currencies'
 import type { ReceiptDraft } from '@/lib/receipts'
 import type { AddTransactionState } from '../actions'
@@ -27,11 +28,13 @@ export default function TransactionForm({
   const [type, setType] = useCookieState('tx-type')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
+  const [description, setDescription] = useState('')
   const [date, setDate] = useState(today)
 
   function handleScanSuccess(draft: ReceiptDraft) {
     setAmount(String(draft.amount))
-    setCategory(draft.category)
+    setCategory(suggestCategory(draft.category))
+    setDescription(draft.category)
     setDate(draft.date)
     setCurrency(draft.currency)
     setType(draft.type)
@@ -41,6 +44,7 @@ export default function TransactionForm({
     onSubmit(formData)
     setAmount('')
     setCategory('')
+    setDescription('')
     setDate(today)
   }
 
@@ -87,15 +91,29 @@ export default function TransactionForm({
         </NativeSelect>
       </div>
 
+      <Input
+        name="description"
+        type="text"
+        placeholder="Заметка"
+        className="w-full"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+
       <div className="flex gap-2">
-        <Input
+        <NativeSelect
           name="category"
-          type="text"
-          placeholder="Категория"
           className="w-full"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-        />
+        >
+          <option value="">Категория: авто</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.key} value={c.key}>
+              {c.icon} {c.label}
+            </option>
+          ))}
+        </NativeSelect>
         <Input
           name="date"
           type="date"
