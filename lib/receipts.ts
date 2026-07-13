@@ -28,7 +28,9 @@ const ReceiptResponseSchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 })
 
-const categoryList = CATEGORIES.map((c) => `${c.key} (${c.label})`).join(', ')
+const categoryList = CATEGORIES.map((c) => `${c.key} (${c.label.en})`).join(
+  ', ',
+)
 
 const client = new Anthropic()
 

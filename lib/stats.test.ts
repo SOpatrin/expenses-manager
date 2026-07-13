@@ -83,7 +83,7 @@ describe('groupByCategory', () => {
     const txs = [tx(10, 'USD', 'expense', { category: null })]
     const result = groupByCategory(txs)
     expect(result[0].key).toBe('other')
-    expect(result[0].label).toBe('Прочее')
+    expect(result[0].icon).toBe('📦')
   })
 
   it('конвертирует в целевую валюту, если заданы курсы', () => {
@@ -98,9 +98,7 @@ describe('groupByCategory', () => {
       tx(50, 'USD', 'expense', { category: 'food' }),
     ]
     const result = groupByCategory(txs, undefined, undefined, 'income')
-    expect(result).toEqual([
-      { key: 'salary', label: 'Зарплата', icon: '💰', total: 100 },
-    ])
+    expect(result).toEqual([{ key: 'salary', icon: '💰', total: 100 }])
   })
 })
 

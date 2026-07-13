@@ -3,6 +3,8 @@
 // CATEGORIES — в формах/списке (label + иконка), suggestCategory — авто-присвоение
 // категории по тексту заметки. Чистый модуль: переиспользуется ботом.
 
+import type { Locale } from './i18n'
+
 export const CATEGORY_KEYS = [
   'food',
   'groceries',
@@ -21,22 +23,30 @@ export const CATEGORY_KEYS = [
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number]
 
-type CategoryMeta = { key: CategoryKey; label: string; icon: string }
+export type CategoryMeta = {
+  key: CategoryKey
+  label: Record<Locale, string>
+  icon: string
+}
 
 export const CATEGORIES: readonly CategoryMeta[] = [
-  { key: 'food', label: 'Еда', icon: '🍔' },
-  { key: 'groceries', label: 'Продукты', icon: '🛒' },
-  { key: 'transport', label: 'Транспорт', icon: '🚕' },
-  { key: 'home', label: 'Дом', icon: '🏠' },
-  { key: 'bills', label: 'Счета', icon: '🧾' },
-  { key: 'health', label: 'Здоровье', icon: '💊' },
-  { key: 'fun', label: 'Развлечения', icon: '🎉' },
-  { key: 'shopping', label: 'Покупки', icon: '🛍️' },
-  { key: 'travel', label: 'Путешествия', icon: '✈️' },
-  { key: 'education', label: 'Образование', icon: '📚' },
-  { key: 'gifts', label: 'Подарки', icon: '🎁' },
-  { key: 'salary', label: 'Зарплата', icon: '💰' },
-  { key: 'other', label: 'Прочее', icon: '📦' },
+  { key: 'food', label: { ru: 'Еда', en: 'Food' }, icon: '🍔' },
+  { key: 'groceries', label: { ru: 'Продукты', en: 'Groceries' }, icon: '🛒' },
+  { key: 'transport', label: { ru: 'Транспорт', en: 'Transport' }, icon: '🚕' },
+  { key: 'home', label: { ru: 'Дом', en: 'Home' }, icon: '🏠' },
+  { key: 'bills', label: { ru: 'Счета', en: 'Bills' }, icon: '🧾' },
+  { key: 'health', label: { ru: 'Здоровье', en: 'Health' }, icon: '💊' },
+  { key: 'fun', label: { ru: 'Развлечения', en: 'Fun' }, icon: '🎉' },
+  { key: 'shopping', label: { ru: 'Покупки', en: 'Shopping' }, icon: '🛍️' },
+  { key: 'travel', label: { ru: 'Путешествия', en: 'Travel' }, icon: '✈️' },
+  {
+    key: 'education',
+    label: { ru: 'Образование', en: 'Education' },
+    icon: '📚',
+  },
+  { key: 'gifts', label: { ru: 'Подарки', en: 'Gifts' }, icon: '🎁' },
+  { key: 'salary', label: { ru: 'Зарплата', en: 'Salary' }, icon: '💰' },
+  { key: 'other', label: { ru: 'Прочее', en: 'Other' }, icon: '📦' },
 ]
 
 const CATEGORY_BY_KEY = new Map(CATEGORIES.map((c) => [c.key, c]))
@@ -45,8 +55,20 @@ export function getCategory(key: string): CategoryMeta | undefined {
   return CATEGORY_BY_KEY.get(key as CategoryKey)
 }
 
+export function getCategoryLabel(
+  key: string,
+  locale: Locale,
+): string | undefined {
+  return CATEGORY_BY_KEY.get(key as CategoryKey)?.label[locale]
+}
+
 // Ключевые слова для авто-присвоения. Совпадение по подстроке в нормализованном
 // тексте; перебор в порядке KEYWORDS, первое совпадение выигрывает.
+// EN-токены добавлены рядом с RU (оба языка активны одновременно). Короткие
+// подстроки проверены на ложные совпадения: 'bar'/'gas' сознательно не
+// добавлены ('barcelona' и 'gastro' ловились бы как food); 'bus' тоже
+// выкинут — словит 'business' раньше, чем более подходящая категория
+// (например 'business trip' стало бы transport вместо travel).
 const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
   [
     'food',
@@ -64,6 +86,14 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'мороженое',
       'вольт',
       'wolt',
+      'cafe',
+      'restaurant',
+      'lunch',
+      'dinner',
+      'breakfast',
+      'coffee',
+      'pizza',
+      'burger',
     ],
   ],
   [
@@ -78,6 +108,9 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'лидл',
       'idea',
       'рынок',
+      'grocery',
+      'supermarket',
+      'market',
     ],
   ],
   [
@@ -91,9 +124,25 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'uber',
       'bolt',
       'парковк',
+      'taxi',
+      'metro',
+      'fuel',
+      'parking',
     ],
   ],
-  ['home', ['аренда', 'квартира', 'ремонт', 'мебель', 'дом']],
+  [
+    'home',
+    [
+      'аренда',
+      'квартира',
+      'ремонт',
+      'мебель',
+      'дом',
+      'rent',
+      'furniture',
+      'repair',
+    ],
+  ],
   [
     'bills',
     [
@@ -105,11 +154,28 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'связь',
       'налог',
       'подписк',
+      'utilities',
+      'electricity',
+      'internet',
+      'tax',
+      'subscription',
     ],
   ],
   [
     'health',
-    ['аптека', 'врач', 'лекарств', 'клиника', 'стоматолог', 'анализ', 'массаж'],
+    [
+      'аптека',
+      'врач',
+      'лекарств',
+      'клиника',
+      'стоматолог',
+      'анализ',
+      'массаж',
+      'pharmacy',
+      'doctor',
+      'dentist',
+      'clinic',
+    ],
   ],
   [
     'fun',
@@ -126,6 +192,11 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'музык',
       'ютуб',
       'youtube',
+      'cinema',
+      'movie',
+      'concert',
+      'game',
+      'party',
     ],
   ],
   [
@@ -142,15 +213,60 @@ const KEYWORDS: ReadonlyArray<readonly [CategoryKey, readonly string[]]> = [
       'косметик',
       'козметик',
       'temu',
+      'clothes',
+      'shoes',
+      'electronics',
+      'cosmetics',
     ],
   ],
   [
     'travel',
-    ['отель', 'билет', 'самолёт', 'самолет', 'поезд', 'путешеств', 'airbnb'],
+    [
+      'отель',
+      'билет',
+      'самолёт',
+      'самолет',
+      'поезд',
+      'путешеств',
+      'airbnb',
+      'hotel',
+      'ticket',
+      'flight',
+      'train',
+      'trip',
+    ],
   ],
-  ['education', ['курс', 'обучение', 'книг', 'университет', 'школа', 'учеб']],
-  ['gifts', ['подарок', 'подарк', 'цвет']],
-  ['salary', ['зарплат', 'аванс', 'премия', 'доход', 'salary', 'получк', 'зп']],
+  [
+    'education',
+    [
+      'курс',
+      'обучение',
+      'книг',
+      'университет',
+      'школа',
+      'учеб',
+      'course',
+      'book',
+      'school',
+      'university',
+    ],
+  ],
+  ['gifts', ['подарок', 'подарк', 'цвет', 'gift', 'flowers']],
+  [
+    'salary',
+    [
+      'зарплат',
+      'аванс',
+      'премия',
+      'доход',
+      'salary',
+      'получк',
+      'зп',
+      'paycheck',
+      'bonus',
+      'income',
+    ],
+  ],
 ]
 
 export function suggestCategory(text: string | null | undefined): CategoryKey {

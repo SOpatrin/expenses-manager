@@ -64,7 +64,6 @@ function amountIn(
 
 export type CategorySlice = {
   key: string
-  label: string
   icon: string
   total: number
 }
@@ -83,10 +82,11 @@ export function groupByCategory(
     const key = getCategory(t.category ?? '') ? t.category! : 'other'
     totals.set(key, (totals.get(key) ?? 0) + amountIn(t, rates, targetCurrency))
   }
+  // Лейбл здесь не резолвим — он локале-зависимый, UI берёт его сам
+  // через getCategoryLabel(key, locale).
   return [...totals.entries()]
     .map(([key, total]) => {
-      const meta = getCategory(key)
-      return { key, label: meta?.label ?? key, icon: meta?.icon ?? '📦', total }
+      return { key, icon: getCategory(key)?.icon ?? '📦', total }
     })
     .sort((a, b) => b.total - a.total)
 }
