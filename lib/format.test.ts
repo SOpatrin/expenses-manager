@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatMoney, formatNumber } from './format'
+import { formatDate, formatMoney, formatNumber } from './format'
 
 // Intl вставляет неразрывный ( ) / узкий неразрывный ( ) пробел
 // между разрядами в ru-выводе — нормализуем к обычному пробелу перед сравнением.
@@ -41,5 +41,15 @@ describe('formatNumber', () => {
     expect(
       normalizeSpaces(formatNumber(1234.5, 'ru', { maximumFractionDigits: 0 })),
     ).toBe('1 235')
+  })
+})
+
+describe('formatDate', () => {
+  it('переставляет ISO-дату в день.месяц.год', () => {
+    expect(formatDate('2026-07-13')).toBe('13.07.2026')
+  })
+
+  it('не зависит от локали (одинаково для ru и en)', () => {
+    expect(formatDate('2026-01-05')).toBe('05.01.2026')
   })
 })

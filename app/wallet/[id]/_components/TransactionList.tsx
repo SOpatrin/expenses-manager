@@ -5,7 +5,7 @@ import { useLocale, useT } from '@/app/_i18n/client'
 import { SwipeableRow } from '@/components/ui/swipeable-row'
 import type { Locale } from '@/lib/i18n'
 import { getCategory, getCategoryLabel } from '@/lib/categories'
-import { formatMoney } from '@/lib/format'
+import { formatDate, formatMoney } from '@/lib/format'
 import type { Transaction } from '@/lib/transactions'
 import { InlineEditForm } from './InlineEditForm'
 
@@ -79,7 +79,9 @@ export default function TransactionList({
                       const cat = getCategory(tx.category ?? '')
                       return cat ? `${cat.icon} ${cat.label[locale]} · ` : ''
                     })()}
-                    <span className="whitespace-nowrap">{tx.date}</span>
+                    <span className="whitespace-nowrap">
+                      {formatDate(tx.date)}
+                    </span>
                   </span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

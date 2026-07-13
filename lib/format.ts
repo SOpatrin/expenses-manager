@@ -29,3 +29,11 @@ export function formatNumber(
 ): string {
   return new Intl.NumberFormat(INTL_TAG[locale], options).format(value)
 }
+
+// date — 'YYYY-MM-DD' (формат дат в БД/lib/transactions). Всегда день.месяц.год,
+// независимо от локали: строковая перестановка вместо new Date()+Intl не
+// зависит от часового пояса и не превращается в M/D/YYYY для en-локали.
+export function formatDate(date: string): string {
+  const [year, month, day] = date.split('-')
+  return `${day}.${month}.${year}`
+}
