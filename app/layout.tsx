@@ -17,13 +17,17 @@ export const viewport: Viewport = {
   themeColor: '#18181b',
 }
 
+// Статичные метаданные, а не generateMetadata(): под cacheComponents чтение
+// cookies() в root metadata ломает статическую прегенерацию служебных страниц
+// вроде /_not-found (next-prerender-dynamic-metadata). Нейтральный
+// англоязычный текст — цена почти нулевая для auth-gated PWA.
 export const metadata: Metadata = {
   title: 'Expense Tracker',
-  description: 'Личный трекер доходов и расходов',
+  description: 'Personal income & expense tracker',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Расходы',
+    title: 'Expenses',
   },
   icons: {
     apple: '/apple-touch-icon.png',
