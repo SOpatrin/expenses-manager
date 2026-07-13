@@ -268,10 +268,10 @@ export default function Analytics({
                       className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ backgroundColor: COLORS[i % COLORS.length] }}
                     />
-                    <span className="text-zinc-600 dark:text-zinc-300">
+                    <span className="min-w-0 flex-1 truncate text-zinc-600 dark:text-zinc-300">
                       {s.icon} {getCategoryLabel(s.key, locale) ?? s.key}
                     </span>
-                    <span className="ml-auto font-medium text-zinc-800 dark:text-zinc-100">
+                    <span className="shrink-0 font-medium text-zinc-800 dark:text-zinc-100">
                       {nf(s.total)}
                       {suffix}
                     </span>

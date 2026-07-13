@@ -46,20 +46,22 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
   const { t } = await getT()
 
   return (
-    <div className="mb-6 flex items-center justify-between gap-3">
-      <Link
-        href="/wallets"
-        className="shrink-0 text-zinc-400 hover:text-zinc-600 lg:hidden dark:hover:text-zinc-200"
-        aria-label={t.wallets.allWallets}
-      >
-        ←
-      </Link>
-      <WalletNameEditor walletId={id} initialName={wallet.name} />
-      <div className="flex items-center gap-3">
+    <div className="mb-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <Link
+          href="/wallets"
+          className="shrink-0 text-zinc-400 hover:text-zinc-600 lg:hidden dark:hover:text-zinc-200"
+          aria-label={t.wallets.allWallets}
+        >
+          ←
+        </Link>
+        <WalletNameEditor walletId={id} initialName={wallet.name} />
+      </div>
+      <div className="flex shrink-0 items-center justify-end gap-3">
         {!isGuest && (
           <Link
             href={`/wallet/${id}/settings`}
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            className="text-sm whitespace-nowrap text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
             {t.wallets.members}
           </Link>
@@ -67,7 +69,7 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
         <form action={signOutAction}>
           <button
             type="submit"
-            className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            className="text-sm whitespace-nowrap text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
             {t.common.signOut}
           </button>
@@ -127,7 +129,7 @@ async function getCachedRates() {
 
 function HeaderSkeleton() {
   return (
-    <div className="mb-6 flex items-center justify-between gap-3">
+    <div className="mb-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
       <div className={`${pulse} h-7 w-32`} />
       <div className={`${pulse} h-4 w-12`} />
     </div>

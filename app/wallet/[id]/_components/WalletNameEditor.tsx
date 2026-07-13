@@ -45,7 +45,7 @@ export function WalletNameEditor({
       disabled={isPending}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className="w-full bg-transparent text-xl font-semibold text-zinc-800 focus:border-b focus:border-zinc-400 focus:outline-none disabled:opacity-50 dark:text-zinc-100 dark:focus:border-zinc-500"
+      className="min-w-0 flex-1 truncate bg-transparent text-xl font-semibold text-zinc-800 focus:border-b focus:border-zinc-400 focus:outline-none disabled:opacity-50 dark:text-zinc-100 dark:focus:border-zinc-500"
     />
   )
 }

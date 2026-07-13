@@ -76,13 +76,14 @@ export function InviteSection({
             {pendingInvites.map((inv) => (
               <li
                 key={inv.token}
-                className="flex items-center justify-between py-2"
+                className="flex items-center justify-between gap-3 py-2"
               >
-                <span className="font-mono text-xs text-zinc-500">
+                <span className="min-w-0 truncate font-mono text-xs text-zinc-500">
                   {inv.email ?? inv.token.slice(0, 8) + '…'}
                 </span>
                 <form
                   action={revokeInviteAction.bind(null, walletId, inv.token)}
+                  className="shrink-0"
                 >
                   <button
                     type="submit"

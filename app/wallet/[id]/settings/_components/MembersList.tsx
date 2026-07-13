@@ -19,16 +19,19 @@ export function MembersList({
   return (
     <ul className="mb-8 divide-y divide-zinc-100 dark:divide-zinc-800">
       {members.map((m) => (
-        <li key={m.userId} className="flex items-center justify-between py-3">
-          <div>
-            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
+        <li
+          key={m.userId}
+          className="flex items-center justify-between gap-3 py-3"
+        >
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
               {m.name ?? m.email ?? m.userId}
             </p>
             {m.email && m.name && (
-              <p className="text-xs text-zinc-400">{m.email}</p>
+              <p className="truncate text-xs text-zinc-400">{m.email}</p>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <span className="text-xs text-zinc-400">
               {m.role === 'owner' ? t.settings.owner : t.settings.member}
             </span>

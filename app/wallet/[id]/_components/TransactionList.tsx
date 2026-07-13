@@ -65,16 +65,16 @@ export default function TransactionList({
               disabled={isDeleting || isUpdating}
             >
               <div
-                className="flex cursor-pointer items-center justify-between py-3"
+                className="flex cursor-pointer items-center justify-between gap-3 py-3"
                 onClick={() => onEdit(tx.id)}
               >
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">
                     {tx.description ||
                       getCategoryLabel(tx.category ?? '', locale) ||
                       t.list.noCategory}
                   </span>
-                  <span className="text-xs text-zinc-400">
+                  <span className="truncate text-xs text-zinc-400">
                     {(() => {
                       const cat = getCategory(tx.category ?? '')
                       return cat ? `${cat.icon} ${cat.label[locale]} · ` : ''
@@ -82,7 +82,7 @@ export default function TransactionList({
                     <span className="whitespace-nowrap">{tx.date}</span>
                   </span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1">
                   <span
                     className={
                       tx.type === 'income'

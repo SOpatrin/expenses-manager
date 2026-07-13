@@ -31,17 +31,17 @@ async function WalletsContent() {
 
   return (
     <CookiesProvider initial={{ locale }}>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
           {t.wallets.title}
         </h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <ThemeToggle />
           <LanguageToggle />
           <form action={signOutAction}>
             <button
               type="submit"
-              className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+              className="text-sm whitespace-nowrap text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
             >
               {t.common.signOut}
             </button>
@@ -82,9 +82,9 @@ async function CachedWalletListItems({ userId }: { userId: string }) {
 function PageSkeleton() {
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className={`${pulse} h-7 w-24`} />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-end gap-2">
           <div className={`${pulse} h-7 w-20`} />
           <div className={`${pulse} h-7 w-14`} />
         </div>
@@ -115,10 +115,10 @@ function WalletListItems({ wallets }: { wallets: Wallet[] }) {
         <li key={w.id}>
           <Link
             href={`/wallet/${w.id}`}
-            className="flex items-center justify-between py-3 text-zinc-800 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
+            className="flex items-center justify-between gap-2 py-3 text-zinc-800 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
           >
-            <span className="font-medium">{w.name}</span>
-            <span className="text-zinc-400">→</span>
+            <span className="min-w-0 truncate font-medium">{w.name}</span>
+            <span className="shrink-0 text-zinc-400">→</span>
           </Link>
         </li>
       ))}
