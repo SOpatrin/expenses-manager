@@ -12,7 +12,7 @@
 
 ## Стек
 
-- Next 15 (App Router)
+- Next 16 (App Router)
 - React 19 (RSC, Server Actions)
 - TypeScript, strict mode
 - Drizzle ORM + PostgreSQL (Neon)

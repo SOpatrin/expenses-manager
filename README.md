@@ -4,7 +4,7 @@ Income and expense tracker with multi-wallet support and shared access. Installa
 
 ## Stack
 
-- **Next.js 15** — App Router, RSC, Server Actions
+- **Next.js 16** — App Router, RSC, Server Actions
 - **React 19** — `useActionState`, `useOptimistic`, `useFormStatus`
 - **TypeScript** strict
 - **Drizzle ORM** + **PostgreSQL** (Neon)
