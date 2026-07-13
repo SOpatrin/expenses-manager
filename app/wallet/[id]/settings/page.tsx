@@ -4,25 +4,28 @@ import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
 import { requireUser } from '@/app/_session'
+import { getT } from '@/app/_i18n/server'
 import { getWalletInvites } from '@/lib/invites'
-import { getWallet, getWalletMembers, type WalletMember } from '@/lib/wallets'
+import { getWallet, getWalletMembers } from '@/lib/wallets'
 
-import { removeWalletMemberAction } from '../actions'
+import { MembersList } from './_components/MembersList'
 import { InviteSection } from './_components/InviteSection'
 
 const pulse = 'animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800'
 
-export default function WalletSettingsPage({
+export default async function WalletSettingsPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
+  const { t } = await getT()
+
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
       <div className="mb-6 flex items-center gap-3">
         <BackLink params={params} />
         <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
-          Участники
+          {t.settings.title}
         </h1>
       </div>
       <Suspense fallback={<MembersSkeleton />}>
@@ -83,50 +86,6 @@ async function CachedMembersContent({
         isOwner={isOwner}
       />
     </>
-  )
-}
-
-function MembersList({
-  walletId,
-  members,
-  isOwner,
-}: {
-  walletId: string
-  members: WalletMember[]
-  isOwner: boolean
-}) {
-  return (
-    <ul className="mb-8 divide-y divide-zinc-100 dark:divide-zinc-800">
-      {members.map((m) => (
-        <li key={m.userId} className="flex items-center justify-between py-3">
-          <div>
-            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-100">
-              {m.name ?? m.email ?? m.userId}
-            </p>
-            {m.email && m.name && (
-              <p className="text-xs text-zinc-400">{m.email}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-400">
-              {m.role === 'owner' ? 'владелец' : 'участник'}
-            </span>
-            {isOwner && m.role !== 'owner' && (
-              <form
-                action={removeWalletMemberAction.bind(null, walletId, m.userId)}
-              >
-                <button
-                  type="submit"
-                  className="text-xs text-zinc-400 hover:text-red-500 dark:hover:text-red-400"
-                >
-                  Удалить
-                </button>
-              </form>
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
   )
 }
 

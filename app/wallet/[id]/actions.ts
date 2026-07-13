@@ -4,11 +4,14 @@ import { updateTag } from 'next/cache'
 import { z } from 'zod'
 
 import { signOut } from '@/auth'
+import type { Dict } from '@/app/_i18n'
+import { getT } from '@/app/_i18n/server'
 import { requireUserId } from '@/app/_session'
 import { CATEGORY_KEYS, suggestCategory } from '@/lib/categories'
 import { CURRENCIES, TX_TYPES } from '@/lib/currencies'
 import { checkAndIncrementScanLimit } from '@/lib/receipt-limits'
-import { parseReceiptImage, type ReceiptDraft } from '@/lib/receipts'
+import { ReceiptParseError, parseReceiptImage } from '@/lib/receipts'
+import type { ReceiptDraft } from '@/lib/receipts'
 import {
   createTransaction,
   deleteTransaction,
@@ -16,20 +19,23 @@ import {
 } from '@/lib/transactions'
 import { removeWalletMember, renameWallet } from '@/lib/wallets'
 
-const schema = z.object({
-  amount: z.preprocess(
-    (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
-    z.coerce.number().positive(),
-  ),
-  currency: z.enum(CURRENCIES),
-  type: z.enum(TX_TYPES),
-  category: z.enum(CATEGORY_KEYS).optional(),
-  description: z.string().optional(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-})
+const makeSchema = (t: Dict) =>
+  z.object({
+    amount: z.preprocess(
+      (v) => (typeof v === 'string' ? v.replace(',', '.') : v),
+      z.coerce
+        .number({ error: t.form.amountInvalid })
+        .positive(t.form.amountInvalid),
+    ),
+    currency: z.enum(CURRENCIES),
+    type: z.enum(TX_TYPES),
+    category: z.enum(CATEGORY_KEYS).optional(),
+    description: z.string().optional(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t.form.dateInvalid),
+  })
 
 // Категория не выбрана явно → выводим из заметки по ключевым словам.
-function withCategory(data: z.infer<typeof schema>) {
+function withCategory(data: z.infer<ReturnType<typeof makeSchema>>) {
   return {
     ...data,
     category: data.category ?? suggestCategory(data.description),
@@ -47,8 +53,9 @@ export async function addTransaction(
   formData: FormData,
 ): Promise<AddTransactionState> {
   const userId = await requireUserId()
+  const { t } = await getT()
 
-  const parsed = schema.safeParse({
+  const parsed = makeSchema(t).safeParse({
     amount: formData.get('amount'),
     currency: formData.get('currency'),
     type: formData.get('type'),
@@ -73,8 +80,9 @@ export async function updateTransactionAction(
   formData: FormData,
 ): Promise<void> {
   const userId = await requireUserId()
+  const { t } = await getT()
 
-  const parsed = schema.safeParse({
+  const parsed = makeSchema(t).safeParse({
     amount: formData.get('amount'),
     currency: formData.get('currency'),
     type: formData.get('type'),
@@ -130,30 +138,32 @@ export async function scanReceiptAction(
   formData: FormData,
 ): Promise<ScanReceiptState> {
   const userId = await requireUserId()
+  const { t } = await getT()
 
   const image = formData.get('image')
   if (typeof image !== 'string' || !image) {
-    return { status: 'error', message: 'Изображение не передано' }
+    return { status: 'error', message: t.scan.noImage }
   }
 
   // base64 строка примерно на 33% длиннее бинарного файла; лимит ~4 MB
   if (image.length > 5_500_000) {
-    return { status: 'error', message: 'Файл слишком большой' }
+    return { status: 'error', message: t.scan.tooLarge }
   }
 
   const { allowed, limit } = await checkAndIncrementScanLimit(userId)
   if (!allowed) {
     return {
       status: 'error',
-      message: `Достигнут лимит сканирований на сегодня (${limit} в день)`,
+      message: t.scan.limitReached(limit ?? 0),
     }
   }
 
   try {
     const data = await parseReceiptImage(image)
     return { status: 'success', data }
-  } catch {
-    return { status: 'error', message: 'Не удалось распознать чек' }
+  } catch (e) {
+    const code = e instanceof ReceiptParseError ? e.code : 'unrecognized'
+    return { status: 'error', message: t.scan.parseError[code] }
   }
 }
 

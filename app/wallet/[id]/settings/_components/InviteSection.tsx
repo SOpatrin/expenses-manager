@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 
 import { createInviteAction, revokeInviteAction } from '@/app/actions/invites'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/app/_i18n/client'
 import type { PendingInvite } from '@/lib/invites'
 
 export function InviteSection({
@@ -19,6 +20,7 @@ export function InviteSection({
 }) {
   const [inviteUrl, setInviteUrl] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const t = useT()
 
   if (!isOwner) return null
 
@@ -28,20 +30,20 @@ export function InviteSection({
       const url = `${window.location.origin}/invite/${token}`
       setInviteUrl(url)
       navigator.clipboard.writeText(url)
-      toast.success('Ссылка скопирована')
+      toast.success(t.settings.linkCopied)
     })
   }
 
   function handleCopy() {
     if (!inviteUrl) return
     navigator.clipboard.writeText(inviteUrl)
-    toast.success('Ссылка скопирована')
+    toast.success(t.settings.linkCopied)
   }
 
   return (
     <div>
       <h2 className="mb-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-        Пригласить
+        {t.settings.inviteTitle}
       </h2>
 
       {inviteUrl ? (
@@ -61,13 +63,15 @@ export function InviteSection({
           variant="outline"
           className="mb-4"
         >
-          {isPending ? '...' : 'Создать ссылку-приглашение'}
+          {isPending ? '...' : t.settings.createInviteLink}
         </Button>
       )}
 
       {pendingInvites.length > 0 && (
         <div>
-          <p className="mb-2 text-xs text-zinc-400">Активные приглашения</p>
+          <p className="mb-2 text-xs text-zinc-400">
+            {t.settings.activeInvites}
+          </p>
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {pendingInvites.map((inv) => (
               <li
@@ -84,7 +88,7 @@ export function InviteSection({
                     type="submit"
                     className="text-xs text-zinc-400 hover:text-red-500 dark:hover:text-red-400"
                   >
-                    Отозвать
+                    {t.settings.revoke}
                   </button>
                 </form>
               </li>
