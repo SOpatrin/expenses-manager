@@ -1,3 +1,6 @@
+'use client'
+
+import { useLocale, useT } from '@/app/_i18n/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -16,6 +19,8 @@ export function InlineEditForm({
   onCancel: () => void
   disabled: boolean
 }) {
+  const dict = useT()
+  const { locale } = useLocale()
   return (
     <form
       action={onSave}
@@ -45,7 +50,7 @@ export function InlineEditForm({
         <NativeSelect name="type" defaultValue={t.type} className="py-1.5">
           {TX_TYPES.map((ty) => (
             <option key={ty} value={ty}>
-              {TX_TYPE_LABELS[ty]}
+              {TX_TYPE_LABELS[locale][ty]}
             </option>
           ))}
         </NativeSelect>
@@ -54,7 +59,7 @@ export function InlineEditForm({
         name="description"
         type="text"
         defaultValue={t.description ?? ''}
-        placeholder="Заметка"
+        placeholder={dict.form.note}
         className="w-full py-1.5"
       />
       <div className="flex gap-2">
@@ -63,10 +68,10 @@ export function InlineEditForm({
           defaultValue={t.category ?? ''}
           className="w-full py-1.5"
         >
-          <option value="">🏷️ Авто</option>
+          <option value="">{dict.form.autoCategory}</option>
           {CATEGORIES.map((c) => (
             <option key={c.key} value={c.key}>
-              {c.icon} {c.label}
+              {c.icon} {c.label[locale]}
             </option>
           ))}
         </NativeSelect>
@@ -86,10 +91,10 @@ export function InlineEditForm({
           onClick={onCancel}
           disabled={disabled}
         >
-          Отмена
+          {dict.common.cancel}
         </Button>
         <Button type="submit" size="sm" disabled={disabled}>
-          Сохранить
+          {dict.common.save}
         </Button>
       </div>
     </form>

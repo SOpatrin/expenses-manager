@@ -13,8 +13,15 @@ import {
 } from 'recharts'
 
 import { useCookieState } from '@/app/_hooks/useCookieState'
-import { type CategoryKey, getCategory } from '@/lib/categories'
-import type { TxType } from '@/lib/currencies'
+import { useLocale, useT } from '@/app/_i18n/client'
+import {
+  type CategoryKey,
+  getCategory,
+  getCategoryLabel,
+} from '@/lib/categories'
+import { TX_TYPE_LABELS, type TxType } from '@/lib/currencies'
+import { formatNumber } from '@/lib/format'
+import type { Locale } from '@/lib/i18n'
 import { groupByCategory, groupByPeriod } from '@/lib/stats'
 import type { Transaction } from '@/lib/transactions'
 
@@ -34,7 +41,8 @@ const COLORS = [
   '#71717a',
 ]
 
-const nf = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 })
+const makeNf = (locale: Locale) => (value: number) =>
+  formatNumber(value, locale, { maximumFractionDigits: 0 })
 
 // Гранулярность динамики по фактическому размаху дат, а не по имени периода:
 // до ~квартала — по дням (видно много точек), шире — по месяцам.
@@ -66,6 +74,7 @@ function ChartTooltip({
   label,
   suffix = '',
   percentOf,
+  locale,
 }: {
   active?: boolean
   payload?: Array<{
@@ -77,8 +86,10 @@ function ChartTooltip({
   label?: string
   suffix?: string
   percentOf?: number
+  locale: Locale
 }) {
   if (!active || !payload?.length) return null
+  const nf = makeNf(locale)
   return (
     <div className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
       {label ? <div className="mb-1 text-zinc-400">{label}</div> : null}
@@ -96,7 +107,7 @@ function ChartTooltip({
             />
             <span className="text-zinc-600 dark:text-zinc-300">{p.name}</span>
             <span className="ml-2 font-medium text-zinc-800 dark:text-zinc-100">
-              {nf.format(value)}
+              {nf(value)}
               {suffix}
               {pct !== null ? ` · ${pct}%` : ''}
             </span>
@@ -120,6 +131,9 @@ export default function Analytics({
   activeCategory: CategoryKey | ''
   onCategoryChange: (c: CategoryKey | '') => void
 }) {
+  const t = useT()
+  const { locale } = useLocale()
+  const nf = makeNf(locale)
   const [displayCurrency] = useCookieState('display-currency')
   const target =
     displayCurrency && displayCurrency in rates ? displayCurrency : undefined
@@ -128,7 +142,9 @@ export default function Analytics({
   // Pie следует за фильтром типа: доходы → доходы по категориям, иначе расходы.
   const pieType: 'expense' | 'income' = type === 'income' ? 'income' : 'expense'
   const pieTitle =
-    pieType === 'income' ? 'Доходы по категориям' : 'Расходы по категориям'
+    pieType === 'income'
+      ? t.analytics.incomeByCategory
+      : t.analytics.expensesByCategory
   const byCategory = groupByCategory(
     transactions,
     target ? rates : undefined,
@@ -143,7 +159,7 @@ export default function Analytics({
   )
   const total = byCategory.reduce((sum, s) => sum + s.total, 0)
   // Сумма в центре доната: дырка ~124px, ужимаем шрифт под длину строки.
-  const totalText = nf.format(total)
+  const totalText = nf(total)
   const centerFont = Math.max(
     11,
     Math.min(22, Math.floor(112 / (0.62 * Math.max(totalText.length, 1)))),
@@ -159,7 +175,7 @@ export default function Analytics({
   if (transactions.length === 0) {
     return (
       <p className="py-12 text-center text-sm text-zinc-400">
-        Нет данных за выбранный период
+        {t.analytics.noData}
       </p>
     )
   }
@@ -180,11 +196,13 @@ export default function Analytics({
             className="flex items-center gap-1.5 self-start rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             ← {getCategory(activeCategory)?.icon}{' '}
-            {getCategory(activeCategory)?.label} · все категории
+            {getCategoryLabel(activeCategory, locale)} · {t.analytics.backToAll}
           </button>
         ) : byCategory.length === 0 ? (
           <p className="text-sm text-zinc-400">
-            {pieType === 'income' ? 'Доходов нет' : 'Расходов нет'}
+            {pieType === 'income'
+              ? t.analytics.noIncome
+              : t.analytics.noExpenses}
           </p>
         ) : (
           <>
@@ -205,9 +223,12 @@ export default function Analytics({
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
                   <Pie
-                    data={byCategory}
+                    data={byCategory.map((s) => ({
+                      ...s,
+                      name: getCategoryLabel(s.key, locale) ?? s.key,
+                    }))}
                     dataKey="total"
-                    nameKey="label"
+                    nameKey="name"
                     innerRadius={62}
                     outerRadius={92}
                     paddingAngle={0}
@@ -224,7 +245,13 @@ export default function Analytics({
                     ))}
                   </Pie>
                   <Tooltip
-                    content={<ChartTooltip suffix={suffix} percentOf={total} />}
+                    content={
+                      <ChartTooltip
+                        suffix={suffix}
+                        percentOf={total}
+                        locale={locale}
+                      />
+                    }
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -242,10 +269,10 @@ export default function Analytics({
                       style={{ backgroundColor: COLORS[i % COLORS.length] }}
                     />
                     <span className="text-zinc-600 dark:text-zinc-300">
-                      {s.icon} {s.label}
+                      {s.icon} {getCategoryLabel(s.key, locale) ?? s.key}
                     </span>
                     <span className="ml-auto font-medium text-zinc-800 dark:text-zinc-100">
-                      {nf.format(s.total)}
+                      {nf(s.total)}
                       {suffix}
                     </span>
                     <span className="w-9 shrink-0 text-right text-xs text-zinc-400">
@@ -261,7 +288,8 @@ export default function Analytics({
 
       <section className="flex flex-col gap-3">
         <h3 className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          Динамика{target ? ` (${target})` : ''}
+          {t.analytics.dynamics}
+          {target ? ` (${target})` : ''}
         </h3>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart
@@ -282,12 +310,14 @@ export default function Analytics({
               axisLine={false}
               tickFormatter={(v: number) => shortNum(v)}
             />
-            <Tooltip content={<ChartTooltip suffix={suffix} />} />
+            <Tooltip
+              content={<ChartTooltip suffix={suffix} locale={locale} />}
+            />
             {type !== 'expense' && (
               <Line
                 type="monotone"
                 dataKey="income"
-                name="Доход"
+                name={TX_TYPE_LABELS[locale].income}
                 stroke="#10b981"
                 strokeWidth={2}
                 dot={{ r: 3, strokeWidth: 0, fill: '#10b981' }}
@@ -297,7 +327,7 @@ export default function Analytics({
               <Line
                 type="monotone"
                 dataKey="expense"
-                name="Расход"
+                name={TX_TYPE_LABELS[locale].expense}
                 stroke="#ef4444"
                 strokeWidth={2}
                 dot={{ r: 3, strokeWidth: 0, fill: '#ef4444' }}

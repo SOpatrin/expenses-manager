@@ -9,6 +9,8 @@ import {
 } from 'react'
 import { Camera, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useT } from '@/app/_i18n/client'
+import type { Dict } from '@/app/_i18n'
 import { Button } from '@/components/ui/button'
 import { type ScanReceiptState, scanReceiptAction } from '../actions'
 import type { ReceiptDraft } from '@/lib/receipts'
@@ -33,19 +35,14 @@ async function toJpegBlob(file: File): Promise<Blob> {
   return Array.isArray(result) ? result[0] : result
 }
 
-function compressBlob(blob: Blob): Promise<string> {
+function compressBlob(blob: Blob, t: Dict): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onerror = () => reject(new Error('Не удалось прочитать файл'))
+    reader.onerror = () => reject(new Error(t.scan.readFailed))
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string
       const img = new Image()
-      img.onerror = () =>
-        reject(
-          new Error(
-            'Поддерживаются HEIC, JPEG, PNG, WebP. Попробуйте другой файл.',
-          ),
-        )
+      img.onerror = () => reject(new Error(t.scan.unsupportedFormat))
       img.onload = () => {
         const maxSize = 1200
         const ratio = Math.min(maxSize / img.width, maxSize / img.height, 1)
@@ -63,9 +60,9 @@ function compressBlob(blob: Blob): Promise<string> {
   })
 }
 
-async function compressImage(file: File): Promise<string> {
+async function compressImage(file: File, t: Dict): Promise<string> {
   const blob = await toJpegBlob(file)
-  return compressBlob(blob)
+  return compressBlob(blob, t)
 }
 
 export default function ReceiptScanButton({
@@ -77,6 +74,7 @@ export default function ReceiptScanButton({
   onScanSuccess: (draft: ReceiptDraft) => void
   disabled?: boolean
 }) {
+  const t = useT()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isCompressing, setIsCompressing] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -109,13 +107,9 @@ export default function ReceiptScanButton({
     let image: string
     setIsCompressing(true)
     try {
-      image = await compressImage(file)
+      image = await compressImage(file, t)
     } catch (err) {
-      toast.error(
-        err instanceof Error
-          ? err.message
-          : 'Не удалось обработать изображение',
-      )
+      toast.error(err instanceof Error ? err.message : t.scan.processFailed)
       return
     } finally {
       setIsCompressing(false)
@@ -140,7 +134,7 @@ export default function ReceiptScanButton({
         variant="outline"
         disabled={disabled || isCompressing || isPending}
         onClick={() => inputRef.current?.click()}
-        title="Сканировать чек"
+        title={t.scan.buttonTitle}
       >
         {isCompressing || isPending ? (
           <Loader2 className="animate-spin" />

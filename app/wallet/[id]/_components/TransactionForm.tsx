@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useCookieState } from '@/app/_hooks/useCookieState'
+import { useLocale, useT } from '@/app/_i18n/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
@@ -24,6 +25,8 @@ export default function TransactionForm({
   addState: AddTransactionState
   isAdding: boolean
 }) {
+  const t = useT()
+  const { locale } = useLocale()
   const [currency, setCurrency] = useCookieState('tx-currency')
   const [type, setType] = useCookieState('tx-type')
   const [amount, setAmount] = useState('')
@@ -61,7 +64,7 @@ export default function TransactionForm({
           name="amount"
           type="text"
           inputMode="decimal"
-          placeholder="Сумма"
+          placeholder={t.form.amount}
           required
           className="w-full"
           value={amount}
@@ -83,9 +86,9 @@ export default function TransactionForm({
           value={type}
           onChange={(e) => setType(e.target.value)}
         >
-          {TX_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {TX_TYPE_LABELS[t]}
+          {TX_TYPES.map((txType) => (
+            <option key={txType} value={txType}>
+              {TX_TYPE_LABELS[locale][txType]}
             </option>
           ))}
         </NativeSelect>
@@ -94,7 +97,7 @@ export default function TransactionForm({
       <Input
         name="description"
         type="text"
-        placeholder="Заметка"
+        placeholder={t.form.note}
         className="w-full"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
@@ -107,10 +110,10 @@ export default function TransactionForm({
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         >
-          <option value="">🏷️ Авто</option>
+          <option value="">{t.form.autoCategory}</option>
           {CATEGORIES.map((c) => (
             <option key={c.key} value={c.key}>
-              {c.icon} {c.label}
+              {c.icon} {c.label[locale]}
             </option>
           ))}
         </NativeSelect>
@@ -134,7 +137,7 @@ export default function TransactionForm({
           disabled={isAdding}
         />
         <Button type="submit" disabled={isAdding} className="flex-1">
-          {isAdding ? 'Сохраняю...' : 'Добавить'}
+          {isAdding ? t.form.saving : t.form.add}
         </Button>
       </div>
     </form>

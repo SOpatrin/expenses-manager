@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useT } from '@/app/_i18n/client'
 import type { CategoryKey } from '@/lib/categories'
 import type { TxType } from '@/lib/currencies'
 import { filterTransactions } from '@/lib/filters'
@@ -24,6 +25,7 @@ export default function WalletView({
   initialTransactions: Transaction[]
   rates: Record<string, number>
 }) {
+  const t = useT()
   const {
     optimisticTransactions,
     addState,
@@ -78,20 +80,20 @@ export default function WalletView({
       />
 
       <div className="flex gap-1.5">
-        {(['list', 'analytics'] as const).map((t) => {
-          const active = tab === t
+        {(['list', 'analytics'] as const).map((tabKey) => {
+          const active = tab === tabKey
           return (
             <button
-              key={t}
+              key={tabKey}
               type="button"
-              onClick={() => setTab(t)}
+              onClick={() => setTab(tabKey)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 active
                   ? 'bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900'
                   : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
               }`}
             >
-              {t === 'list' ? 'Список' : 'Аналитика'}
+              {tabKey === 'list' ? t.tabs.list : t.tabs.analytics}
             </button>
           )
         })}

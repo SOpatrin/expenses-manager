@@ -11,7 +11,8 @@ import {
   useTransition,
 } from 'react'
 import { toast } from 'sonner'
-import { type CategoryKey, getCategory } from '@/lib/categories'
+import { useLocale, useT } from '@/app/_i18n/client'
+import { type CategoryKey, getCategoryLabel } from '@/lib/categories'
 import type { Transaction } from '@/lib/transactions'
 import {
   type AddTransactionState,
@@ -32,6 +33,8 @@ export function useTransactions(
   initialTransactions: Transaction[],
   currentUserId: string,
 ) {
+  const t = useT()
+  const { locale } = useLocale()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isDeleting, startDeleteTransition] = useTransition()
   const [isUpdating, startUpdateTransition] = useTransition()
@@ -102,7 +105,7 @@ export function useTransactions(
       } catch {
         return {
           status: 'error',
-          message: 'Не удалось сохранить. Попробуй ещё раз.',
+          message: t.tx.saveFailed,
         }
       }
     },
@@ -154,7 +157,7 @@ export function useTransactions(
       try {
         await deleteTransactionAction(walletId, id)
       } catch {
-        toast.error('Не удалось удалить. Попробуй ещё раз.')
+        toast.error(t.tx.deleteFailed)
       } finally {
         // Успех: сервер уже отдал список без строки. Ошибка: строка вернётся.
         setPendingDeleteIds((prev) => {
@@ -179,17 +182,17 @@ export function useTransactions(
 
   function handleDelete(id: string) {
     // Строка исчезает мгновенно, реальный delete — после окна отмены.
-    const deleted = optimisticTransactions.find((t) => t.id === id)
+    const deleted = optimisticTransactions.find((tx) => tx.id === id)
     const label =
       deleted?.description ||
-      getCategory(deleted?.category ?? '')?.label ||
-      'запись'
+      getCategoryLabel(deleted?.category ?? '', locale) ||
+      t.tx.fallbackLabel
     setPendingDeleteIds((prev) => new Set(prev).add(id))
     const timer = setTimeout(() => commitDelete(id), UNDO_DELETE_MS)
     timersRef.current.set(id, timer)
-    toast(`Удалили «${label}»`, {
+    toast(t.tx.deleted(label), {
       duration: UNDO_DELETE_MS,
-      action: { label: 'Отменить', onClick: () => cancelDelete(id) },
+      action: { label: t.tx.undo, onClick: () => cancelDelete(id) },
     })
   }
 
@@ -201,7 +204,7 @@ export function useTransactions(
         await updateTransactionAction(walletId, id, formData)
       } catch {
         // useOptimistic откатит состояние сам — показываем уведомление
-        toast.error('Не удалось сохранить изменения. Попробуй ещё раз.')
+        toast.error(t.tx.updateFailed)
       }
     })
   }
