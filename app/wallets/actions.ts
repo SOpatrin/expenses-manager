@@ -4,12 +4,19 @@ import { redirect } from 'next/navigation'
 import { updateTag } from 'next/cache'
 
 import { requireUserId } from '@/app/_session'
+import { getT } from '@/app/_i18n/server'
 import { createWallet, deleteWallet } from '@/lib/wallets'
 
 export async function createWalletAction(formData: FormData): Promise<void> {
   const userId = await requireUserId()
   const name = ((formData.get('name') as string | null) ?? '').trim()
-  const wallet = await createWallet(userId, name || 'Новый кошелёк')
+  if (!name) {
+    const { t } = await getT()
+    const wallet = await createWallet(userId, t.wallets.newWalletPlaceholder)
+    updateTag(`user-wallets-${userId}`)
+    redirect(`/wallet/${wallet.id}`)
+  }
+  const wallet = await createWallet(userId, name)
   updateTag(`user-wallets-${userId}`)
   redirect(`/wallet/${wallet.id}`)
 }

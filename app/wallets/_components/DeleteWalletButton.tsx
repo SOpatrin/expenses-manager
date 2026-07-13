@@ -13,11 +13,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { useT } from '@/app/_i18n/client'
 
 import { deleteWalletAction } from '../actions'
 
 export function DeleteWalletButton({ walletId }: { walletId: string }) {
   const [isPending, startTransition] = useTransition()
+  const t = useT()
 
   return (
     <AlertDialog>
@@ -25,23 +27,22 @@ export function DeleteWalletButton({ walletId }: { walletId: string }) {
         disabled={isPending}
         className="rounded-md px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:hover:bg-red-950/40 dark:hover:text-red-400"
       >
-        {isPending ? '...' : 'Удалить кошелек'}
+        {isPending ? '...' : t.wallets.deleteButton}
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Удалить кошелёк?</AlertDialogTitle>
+          <AlertDialogTitle>{t.wallets.deleteTitle}</AlertDialogTitle>
           <AlertDialogDescription>
-            Все транзакции будут удалены безвозвратно. Это действие нельзя
-            отменить.
+            {t.wallets.deleteDescription}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Отмена</AlertDialogCancel>
+          <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
           <AlertDialogAction
             className="bg-destructive hover:bg-destructive/90 text-white"
             onClick={() => startTransition(() => deleteWalletAction(walletId))}
           >
-            Удалить
+            {t.common.delete}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

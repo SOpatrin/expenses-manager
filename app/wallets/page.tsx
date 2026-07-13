@@ -2,7 +2,10 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
+import { CookiesProvider } from '@/app/_hooks/useCookieState'
+import { LanguageToggle } from '@/app/_components/LanguageToggle'
 import { ThemeToggle } from '@/app/_components/ThemeToggle'
+import { getT } from '@/app/_i18n/server'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { requireUserId } from '@/app/_session'
@@ -16,18 +19,31 @@ const pulse = 'animate-pulse rounded-md bg-zinc-100 dark:bg-zinc-800'
 export default function WalletsPage() {
   return (
     <main className="mx-auto w-full max-w-lg px-4 py-8">
+      <Suspense fallback={<PageSkeleton />}>
+        <WalletsContent />
+      </Suspense>
+    </main>
+  )
+}
+
+async function WalletsContent() {
+  const { locale, t } = await getT()
+
+  return (
+    <CookiesProvider initial={{ locale }}>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-zinc-800 dark:text-zinc-100">
-          Кошельки
+          {t.wallets.title}
         </h1>
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          <LanguageToggle />
           <form action={signOutAction}>
             <button
               type="submit"
               className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
             >
-              Выйти
+              {t.common.signOut}
             </button>
           </form>
         </div>
@@ -38,10 +54,14 @@ export default function WalletsPage() {
       </Suspense>
 
       <form action={createWalletAction} className="flex gap-2">
-        <Input name="name" placeholder="Название кошелька" className="flex-1" />
-        <Button type="submit">Создать</Button>
+        <Input
+          name="name"
+          placeholder={t.wallets.namePlaceholder}
+          className="flex-1"
+        />
+        <Button type="submit">{t.common.create}</Button>
       </form>
-    </main>
+    </CookiesProvider>
   )
 }
 
@@ -57,6 +77,22 @@ async function CachedWalletListItems({ userId }: { userId: string }) {
 
   const wallets = await getWallets(userId)
   return <WalletListItems wallets={wallets} />
+}
+
+function PageSkeleton() {
+  return (
+    <>
+      <div className="mb-6 flex items-center justify-between">
+        <div className={`${pulse} h-7 w-24`} />
+        <div className="flex items-center gap-3">
+          <div className={`${pulse} h-7 w-20`} />
+          <div className={`${pulse} h-7 w-14`} />
+        </div>
+      </div>
+      <WalletListSkeleton />
+      <div className={`${pulse} h-10 w-full`} />
+    </>
+  )
 }
 
 function WalletListSkeleton() {
