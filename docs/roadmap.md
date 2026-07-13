@@ -24,6 +24,7 @@
 - [ ] **Офлайн-режим** — IDB-зеркало, queue-first запись, /api/sync, SW-кеш страниц. Подробный план: [docs/offline.md](offline.md)
 - [x] **Persistence предпочтений** — валюта/тип транзакции и валюта отображения в cookie (сервер засевает при SSR → без вспышки), `useCookieState` поверх контекста; тема осталась на `useLocalStorage`
 - [x] **Тёмная тема** — light/dark/system, inline-скрипт против мерцания, `useTheme` поверх `useLocalStorage`, переключатель в сайдбаре и на странице кошельков
+- [x] **Английская локализация (i18n)** — свой словарь (ru/en) в `app/_i18n/`, cookie + тумблер рядом с ThemeToggle, автодетект по Accept-Language на первый визит; двуязычные лейблы категорий/типов транзакций и EN-ключи в `suggestCategory`; ошибки `receipts`/Zod локализуются на границе Server Action
 
 ## М4 — Фильтры & Аналитика
 

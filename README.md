@@ -32,25 +32,25 @@ pnpm dev   # HTTPS is required for the service worker and secure cookies
 
 Create `.env.local` (gitignored) and fill in the variables:
 
-| Variable                                | Purpose                                |
-| --------------------------------------- | -------------------------------------- |
-| `DATABASE_URL`                          | PostgreSQL (Neon)                      |
-| `AUTH_SECRET`                           | Auth.js JWT session signing            |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth                           |
-| `EXCHANGERATE_API_KEY`                  | Exchange rates                         |
-| `ANTHROPIC_API_KEY`                     | Receipt scanning (Claude Vision)       |
-| `RESEND_API_KEY`                        | Email (reserved, not used yet)         |
+| Variable                                | Purpose                          |
+| --------------------------------------- | -------------------------------- |
+| `DATABASE_URL`                          | PostgreSQL (Neon)                |
+| `AUTH_SECRET`                           | Auth.js JWT session signing      |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth                     |
+| `EXCHANGERATE_API_KEY`                  | Exchange rates                   |
+| `ANTHROPIC_API_KEY`                     | Receipt scanning (Claude Vision) |
+| `RESEND_API_KEY`                        | Email (reserved, not used yet)   |
 
 ## Commands
 
-| Command            | Description                    |
-| ------------------ | ------------------------------ |
-| `pnpm dev`         | Dev server with HTTPS          |
-| `pnpm build`       | Migrations + production build  |
-| `pnpm test`        | Vitest                         |
-| `pnpm db:generate` | Generate a migration           |
-| `pnpm db:migrate`  | Apply migrations               |
-| `pnpm db:studio`   | Drizzle Studio                 |
+| Command            | Description                   |
+| ------------------ | ----------------------------- |
+| `pnpm dev`         | Dev server with HTTPS         |
+| `pnpm build`       | Migrations + production build |
+| `pnpm test`        | Vitest                        |
+| `pnpm db:generate` | Generate a migration          |
+| `pnpm db:migrate`  | Apply migrations              |
+| `pnpm db:studio`   | Drizzle Studio                |
 
 ## Architecture
 
