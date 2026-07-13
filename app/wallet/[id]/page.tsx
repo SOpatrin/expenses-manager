@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { Suspense } from 'react'
 import { cacheLife, cacheTag } from 'next/cache'
 
-import { CookiesProvider } from '@/app/_hooks/useCookieState'
+import { getT } from '@/app/_i18n/server'
 import { requireUser } from '@/app/_session'
 import { getRates } from '@/lib/rates'
 import { getTransactions } from '@/lib/transactions'
@@ -44,13 +43,14 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const wallet = await getCachedWalletMeta(userId, id)
   if (!wallet) notFound()
+  const { t } = await getT()
 
   return (
     <div className="mb-6 flex items-center justify-between gap-3">
       <Link
         href="/wallets"
         className="shrink-0 text-zinc-400 hover:text-zinc-600 lg:hidden dark:hover:text-zinc-200"
-        aria-label="Все кошельки"
+        aria-label={t.wallets.allWallets}
       >
         ←
       </Link>
@@ -61,7 +61,7 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
             href={`/wallet/${id}/settings`}
             className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
-            Участники
+            {t.wallets.members}
           </Link>
         )}
         <form action={signOutAction}>
@@ -69,7 +69,7 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
             type="submit"
             className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
-            Выйти
+            {t.common.signOut}
           </button>
         </form>
       </div>
@@ -80,27 +80,18 @@ async function WalletHeader({ params }: { params: Promise<{ id: string }> }) {
 async function WalletBody({ params }: { params: Promise<{ id: string }> }) {
   const { id: userId } = await requireUser()
   const { id } = await params
-  const [transactions, rates, cookieStore] = await Promise.all([
+  const [transactions, rates] = await Promise.all([
     getCachedTransactions(userId, id),
     getCachedRates(),
-    cookies(),
   ])
 
   return (
-    <CookiesProvider
-      initial={{
-        'display-currency': cookieStore.get('display-currency')?.value ?? '',
-        'tx-currency': cookieStore.get('tx-currency')?.value ?? 'RSD',
-        'tx-type': cookieStore.get('tx-type')?.value ?? 'expense',
-      }}
-    >
-      <WalletView
-        walletId={id}
-        currentUserId={userId}
-        initialTransactions={transactions}
-        rates={rates}
-      />
-    </CookiesProvider>
+    <WalletView
+      walletId={id}
+      currentUserId={userId}
+      initialTransactions={transactions}
+      rates={rates}
+    />
   )
 }
 

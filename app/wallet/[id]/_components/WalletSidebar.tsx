@@ -1,6 +1,10 @@
+'use client'
+
 import Link from 'next/link'
 
+import { LanguageToggle } from '@/app/_components/LanguageToggle'
 import { ThemeToggle } from '@/app/_components/ThemeToggle'
+import { useT } from '@/app/_i18n/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Wallet } from '@/lib/wallets'
@@ -14,10 +18,12 @@ export function WalletSidebar({
   wallets: Wallet[]
   activeId: string
 }) {
+  const t = useT()
+
   return (
     <aside className="hidden w-44 shrink-0 flex-col px-2 py-8 lg:flex">
       <p className="mb-3 px-2 text-xs font-semibold tracking-wide text-zinc-400 uppercase dark:text-zinc-500">
-        Кошельки
+        {t.wallets.title}
       </p>
       <nav className="mb-3 flex flex-col gap-0.5">
         {wallets.map((w) => (
@@ -35,12 +41,17 @@ export function WalletSidebar({
         ))}
       </nav>
       <form action={createWalletAction} className="flex flex-col gap-2">
-        <Input name="name" placeholder="Новый кошелёк" className="text-sm" />
+        <Input
+          name="name"
+          placeholder={t.wallets.newWalletPlaceholder}
+          className="text-sm"
+        />
         <Button type="submit" size="sm" variant="outline" className="w-full">
-          + Создать
+          {t.wallets.createShort}
         </Button>
       </form>
       <ThemeToggle className="mt-4" />
+      <LanguageToggle className="mt-2" />
     </aside>
   )
 }

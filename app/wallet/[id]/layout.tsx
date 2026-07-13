@@ -1,6 +1,9 @@
 import { Suspense } from 'react'
+import { cookies } from 'next/headers'
 import { cacheLife, cacheTag } from 'next/cache'
 
+import { CookiesProvider } from '@/app/_hooks/useCookieState'
+import { getLocale } from '@/app/_i18n/server'
 import { requireUserId } from '@/app/_session'
 import { getWallets } from '@/lib/wallets'
 
@@ -16,13 +19,37 @@ export default function WalletLayout({
   params: Promise<{ id: string }>
 }) {
   return (
-    <div className="flex justify-center">
-      <Suspense fallback={<SidebarSkeleton />}>
-        <Sidebar params={params} />
-      </Suspense>
-      <div className="w-full max-w-lg">{children}</div>
-      <div className="hidden w-44 shrink-0 lg:block" aria-hidden="true" />
-    </div>
+    <Suspense fallback={<ShellSkeleton />}>
+      <CookieShell params={params}>{children}</CookieShell>
+    </Suspense>
+  )
+}
+
+async function CookieShell({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ id: string }>
+}) {
+  const [jar, locale] = await Promise.all([cookies(), getLocale()])
+  return (
+    <CookiesProvider
+      initial={{
+        locale,
+        'display-currency': jar.get('display-currency')?.value ?? '',
+        'tx-currency': jar.get('tx-currency')?.value ?? 'RSD',
+        'tx-type': jar.get('tx-type')?.value ?? 'expense',
+      }}
+    >
+      <div className="flex justify-center">
+        <Suspense fallback={<SidebarSkeleton />}>
+          <Sidebar params={params} />
+        </Suspense>
+        <div className="w-full max-w-lg">{children}</div>
+        <div className="hidden w-44 shrink-0 lg:block" aria-hidden="true" />
+      </div>
+    </CookiesProvider>
   )
 }
 
@@ -45,6 +72,16 @@ async function CachedSidebarWallets({
 
   const wallets = await getWallets(userId)
   return <WalletSidebar wallets={wallets} activeId={activeId} />
+}
+
+function ShellSkeleton() {
+  return (
+    <div className="flex justify-center">
+      <SidebarSkeleton />
+      <div className="w-full max-w-lg" />
+      <div className="hidden w-44 shrink-0 lg:block" aria-hidden="true" />
+    </div>
+  )
 }
 
 function SidebarSkeleton() {
