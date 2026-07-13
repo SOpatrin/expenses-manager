@@ -1,12 +1,15 @@
 'use client'
 
 // Клиентская сторона локали поверх общего CookiesProvider (как валюта).
-// setLocale пишет cookie и делает router.refresh(): клиентский текст
-// обновляется мгновенно через контекст, серверный — после refresh
-// (он же инвалидирует client router cache со старой локалью).
+// setLocale пишет cookie и делает полный reload, а не router.refresh():
+// в next.config.ts включён staleTimes.dynamic (client Router Cache на 5 минут),
+// и refresh() инвалидирует только текущий маршрут — уже посещённые страницы
+// остаются в кэше со старой локалью до истечения staleTime. Полный reload
+// сбрасывает весь client Router Cache целиком, гарантируя свежий рендер
+// везде. Клиентский текст (useT()) при этом уже обновился мгновенно через
+// контекст — reload лишь подтягивает серверные тексты и другие страницы.
 
 import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 
 import { useCookieState } from '@/app/_hooks/useCookieState'
 import { type Locale, normalizeLocale } from '@/lib/i18n'
@@ -17,14 +20,13 @@ export function useLocale(): {
   setLocale: (l: Locale) => void
 } {
   const [raw, setRaw] = useCookieState('locale')
-  const router = useRouter()
   const locale = normalizeLocale(raw)
   const setLocale = useCallback(
     (l: Locale) => {
       setRaw(l)
-      router.refresh()
+      window.location.reload()
     },
-    [setRaw, router],
+    [setRaw],
   )
   return { locale, setLocale }
 }
