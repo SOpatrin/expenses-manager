@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
+import { getT } from '@/app/_i18n/server'
 
 import { signInAsGuest, signInWithGoogle } from './actions'
 import { LoginForm } from './_components/LoginForm'
@@ -39,19 +40,22 @@ export default async function LoginPage({
     typeof callbackUrl === 'string' && callbackUrl.startsWith('/')
       ? callbackUrl
       : '/'
+  const { locale, t } = await getT()
 
   return (
     <div className="bg-background flex min-h-full flex-1 flex-col items-center justify-center">
       <div className="bg-card w-full max-w-sm space-y-6 rounded-xl p-8 shadow-sm">
         <div>
-          <h1 className="text-foreground text-xl font-semibold">Вход</h1>
+          <h1 className="text-foreground text-xl font-semibold">
+            {t.auth.loginTitle}
+          </h1>
           <p className="text-muted-foreground mt-1 text-sm">Expense Tracker</p>
         </div>
 
         <form action={signInWithGoogle.bind(null, safeCallbackUrl)}>
           <Button type="submit" variant="outline" className="w-full gap-2">
             <GoogleIcon />
-            Войти через Google
+            {t.auth.googleButton}
           </Button>
         </form>
 
@@ -60,21 +64,23 @@ export default async function LoginPage({
             <div className="border-border w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-card text-muted-foreground px-2">или</span>
+            <span className="bg-card text-muted-foreground px-2">
+              {t.auth.or}
+            </span>
           </div>
         </div>
 
         <Suspense>
-          <LoginForm />
+          <LoginForm locale={locale} />
         </Suspense>
 
         <p className="text-muted-foreground text-center text-sm">
-          Ещё нет аккаунта?{' '}
+          {t.auth.noAccount}{' '}
           <Link
             href={`/register${safeCallbackUrl !== '/' ? `?callbackUrl=${safeCallbackUrl}` : ''}`}
             className="text-foreground underline"
           >
-            Зарегистрироваться
+            {t.auth.signUp}
           </Link>
         </p>
 
@@ -83,7 +89,7 @@ export default async function LoginPage({
             type="submit"
             className="text-muted-foreground hover:text-foreground w-full text-center text-xs"
           >
-            войти без регистрации
+            {t.auth.guestButton}
           </button>
         </form>
       </div>

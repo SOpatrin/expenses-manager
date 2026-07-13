@@ -5,10 +5,13 @@ import { useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { getDict } from '@/app/_i18n'
+import type { Locale } from '@/lib/i18n'
 
 import { registerWithCredentials } from '../actions'
 
-export function RegisterForm() {
+export function RegisterForm({ locale }: { locale: Locale }) {
+  const t = getDict(locale)
   const searchParams = useSearchParams()
   const raw = searchParams.get('callbackUrl') ?? '/'
   const callbackUrl = raw.startsWith('/') ? raw : '/'
@@ -30,7 +33,7 @@ export function RegisterForm() {
       <Input
         name="password"
         type="password"
-        placeholder="Пароль"
+        placeholder={t.auth.password}
         autoComplete="new-password"
         required
         className="w-full"
@@ -38,14 +41,14 @@ export function RegisterForm() {
       <Input
         name="confirm"
         type="password"
-        placeholder="Повторите пароль"
+        placeholder={t.auth.confirmPassword}
         autoComplete="new-password"
         required
         className="w-full"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
       <Button type="submit" className="w-full" disabled={isPending}>
-        {isPending ? 'Создание...' : 'Зарегистрироваться'}
+        {isPending ? t.auth.signingUp : t.auth.signUp}
       </Button>
     </form>
   )

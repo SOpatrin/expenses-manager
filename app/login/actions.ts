@@ -4,6 +4,7 @@ import { AuthError } from 'next-auth'
 import { cookies } from 'next/headers'
 
 import { signIn } from '@/auth'
+import { getT } from '@/app/_i18n/server'
 import { createGuestUser } from '@/lib/guest'
 
 const GUEST_TOKEN_COOKIE = 'guest-token'
@@ -21,7 +22,10 @@ export async function loginWithCredentials(
       redirectTo: callbackUrl,
     })
   } catch (e) {
-    if (e instanceof AuthError) return 'Неверный email или пароль'
+    if (e instanceof AuthError) {
+      const { t } = await getT()
+      return t.auth.invalidCredentials
+    }
     throw e
   }
   return null

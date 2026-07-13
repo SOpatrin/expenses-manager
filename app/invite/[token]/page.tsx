@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { acceptInviteAction } from '@/app/actions/invites'
 import { Button } from '@/components/ui/button'
+import { getT } from '@/app/_i18n/server'
 import { getInvite } from '@/lib/invites'
 
 export default async function InvitePage({
@@ -11,13 +12,14 @@ export default async function InvitePage({
 }) {
   const { token } = await params
   const invite = await getInvite(token)
+  const { t } = await getT()
 
   if (!invite) notFound()
 
   if (invite.acceptedAt) {
     return (
       <main className="mx-auto max-w-sm px-4 py-16 text-center">
-        <p className="text-zinc-500">Это приглашение уже использовано.</p>
+        <p className="text-zinc-500">{t.invite.used}</p>
       </main>
     )
   }
@@ -25,14 +27,14 @@ export default async function InvitePage({
   return (
     <main className="mx-auto max-w-sm px-4 py-16 text-center">
       <p className="mb-1 text-sm text-zinc-400">
-        {invite.invitedByName ?? 'Кто-то'} приглашает вас в кошелёк
+        {t.invite.invitedBy(invite.invitedByName ?? t.invite.someone)}
       </p>
       <h1 className="mb-8 text-2xl font-semibold text-zinc-800 dark:text-zinc-100">
         {invite.walletName}
       </h1>
       <form action={acceptInviteAction.bind(null, token)}>
         <Button type="submit" className="w-full">
-          Принять приглашение
+          {t.invite.accept}
         </Button>
       </form>
     </main>

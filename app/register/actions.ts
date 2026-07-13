@@ -3,25 +3,29 @@
 import { z } from 'zod'
 
 import { signIn } from '@/auth'
+import { getT } from '@/app/_i18n/server'
+import type { Dict } from '@/app/_i18n'
 import { createUser, EmailTakenError } from '@/lib/users'
 
-const schema = z
-  .object({
-    email: z.string().email('Некорректный email'),
-    password: z.string().min(8, 'Минимум 8 символов'),
-    confirm: z.string(),
-  })
-  .refine((d) => d.password === d.confirm, {
-    message: 'Пароли не совпадают',
-    path: ['confirm'],
-  })
+const makeSchema = (t: Dict) =>
+  z
+    .object({
+      email: z.string().email(t.auth.invalidEmail),
+      password: z.string().min(8, t.auth.passwordMin),
+      confirm: z.string(),
+    })
+    .refine((d) => d.password === d.confirm, {
+      message: t.auth.passwordsMismatch,
+      path: ['confirm'],
+    })
 
 export async function registerWithCredentials(
   callbackUrl: string,
   _prevState: string | null,
   formData: FormData,
 ): Promise<string | null> {
-  const parsed = schema.safeParse({
+  const { t } = await getT()
+  const parsed = makeSchema(t).safeParse({
     email: formData.get('email'),
     password: formData.get('password'),
     confirm: formData.get('confirm'),
@@ -36,7 +40,7 @@ export async function registerWithCredentials(
   try {
     await createUser(email, password)
   } catch (e) {
-    if (e instanceof EmailTakenError) return 'Этот email уже зарегистрирован'
+    if (e instanceof EmailTakenError) return t.auth.emailTaken
     throw e
   }
 

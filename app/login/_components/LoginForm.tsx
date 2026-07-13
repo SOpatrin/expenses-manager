@@ -5,10 +5,13 @@ import { useSearchParams } from 'next/navigation'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { getDict } from '@/app/_i18n'
+import type { Locale } from '@/lib/i18n'
 
 import { loginWithCredentials } from '../actions'
 
-export function LoginForm() {
+export function LoginForm({ locale }: { locale: Locale }) {
+  const t = getDict(locale)
   const searchParams = useSearchParams()
   const raw = searchParams.get('callbackUrl') ?? '/'
   const callbackUrl = raw.startsWith('/') ? raw : '/'
@@ -30,14 +33,14 @@ export function LoginForm() {
       <Input
         name="password"
         type="password"
-        placeholder="Пароль"
+        placeholder={t.auth.password}
         autoComplete="current-password"
         required
         className="w-full"
       />
       {error && <p className="text-sm text-red-600">{error}</p>}
       <Button type="submit" className="w-full" disabled={isPending}>
-        {isPending ? 'Вход...' : 'Войти'}
+        {isPending ? t.auth.signingIn : t.auth.signIn}
       </Button>
     </form>
   )
