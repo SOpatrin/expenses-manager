@@ -9,6 +9,17 @@ import {
 } from './categories'
 import { CURRENCIES, type Currency, TX_TYPES } from './currencies'
 
+// Ошибки — кодами, не текстом: локализованное сообщение подбирает вызывающий
+// слой (Server Action / бот) по своей локали.
+export type ReceiptErrorCode = 'invalid_image' | 'unrecognized'
+
+export class ReceiptParseError extends Error {
+  constructor(public readonly code: ReceiptErrorCode) {
+    super(code)
+    this.name = 'ReceiptParseError'
+  }
+}
+
 export type ReceiptDraft = {
   amount: number
   currency: Currency
@@ -38,7 +49,7 @@ export async function parseReceiptImage(
   imageDataUrl: string,
 ): Promise<ReceiptDraft> {
   const match = imageDataUrl.match(/^data:(image\/\w+);base64,(.+)$/)
-  if (!match) throw new Error('Неверный формат изображения')
+  if (!match) throw new ReceiptParseError('invalid_image')
 
   const mediaType = match[1] as
     | 'image/jpeg'
@@ -80,7 +91,7 @@ Field rules:
 
   const block = response.content.find((b) => b.type === 'text')
   if (!block || block.type !== 'text')
-    throw new Error('Не удалось распознать чек')
+    throw new ReceiptParseError('unrecognized')
 
   const cleaned = block.text
     .replace(/^```(?:json)?\s*/i, '')
@@ -92,7 +103,7 @@ Field rules:
     raw = JSON.parse(cleaned)
   } catch {
     console.error('[receipts] JSON parse failed, raw text:', block.text)
-    throw new Error('Не удалось распознать чек')
+    throw new ReceiptParseError('unrecognized')
   }
 
   const parsed = ReceiptResponseSchema.safeParse(raw)
@@ -103,7 +114,7 @@ Field rules:
       'raw:',
       raw,
     )
-    throw new Error('Не удалось распознать чек')
+    throw new ReceiptParseError('unrecognized')
   }
 
   const data = parsed.data

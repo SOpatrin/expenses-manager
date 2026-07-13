@@ -67,27 +67,30 @@ describe('parseReceiptImage', () => {
     expect(result.description).toBe('Кафе у моря')
   })
 
-  it('throws on invalid JSON response', async () => {
+  it('throws unrecognized on invalid JSON response', async () => {
     mockCreate.mockResolvedValueOnce(makeResponse('not json'))
 
-    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toThrow(
-      'Не удалось распознать чек',
-    )
+    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toMatchObject({
+      name: 'ReceiptParseError',
+      code: 'unrecognized',
+    })
   })
 
-  it('throws when schema validation fails', async () => {
+  it('throws unrecognized when schema validation fails', async () => {
     mockCreate.mockResolvedValueOnce(
       makeResponse(JSON.stringify({ amount: -10, currency: 'RUB' })),
     )
 
-    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toThrow(
-      'Не удалось распознать чек',
-    )
+    await expect(parseReceiptImage(VALID_DATA_URL)).rejects.toMatchObject({
+      name: 'ReceiptParseError',
+      code: 'unrecognized',
+    })
   })
 
-  it('throws on invalid data URL format', async () => {
-    await expect(parseReceiptImage('not-a-data-url')).rejects.toThrow(
-      'Неверный формат изображения',
-    )
+  it('throws invalid_image on invalid data URL format', async () => {
+    await expect(parseReceiptImage('not-a-data-url')).rejects.toMatchObject({
+      name: 'ReceiptParseError',
+      code: 'invalid_image',
+    })
   })
 })
