@@ -68,6 +68,7 @@ export const ru = {
   },
   stats: {
     balance: 'Баланс',
+    balanceForMonth: (month: string) => `Баланс за ${month}`,
   },
   form: {
     amount: 'Сумма',

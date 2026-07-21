@@ -37,3 +37,10 @@ export function formatDate(date: string): string {
   const [year, month, day] = date.split('-')
   return `${day}.${month}.${year}`
 }
+
+// Название месяца в родном падеже локали ('июль' / 'July').
+export function formatMonthName(date: Date, locale: Locale): string {
+  return new Intl.DateTimeFormat(INTL_TAG[locale], { month: 'long' }).format(
+    date,
+  )
+}

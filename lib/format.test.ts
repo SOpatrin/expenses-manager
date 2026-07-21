@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { formatDate, formatMoney, formatNumber } from './format'
+import {
+  formatDate,
+  formatMonthName,
+  formatMoney,
+  formatNumber,
+} from './format'
 
 // Intl вставляет неразрывный ( ) / узкий неразрывный ( ) пробел
 // между разрядами в ru-выводе — нормализуем к обычному пробелу перед сравнением.
@@ -51,5 +56,15 @@ describe('formatDate', () => {
 
   it('не зависит от локали (одинаково для ru и en)', () => {
     expect(formatDate('2026-01-05')).toBe('05.01.2026')
+  })
+})
+
+describe('formatMonthName', () => {
+  it('форматирует название месяца в ru-RU', () => {
+    expect(formatMonthName(new Date(2026, 6, 13), 'ru')).toBe('июль')
+  })
+
+  it('форматирует название месяца в en-US', () => {
+    expect(formatMonthName(new Date(2026, 6, 13), 'en')).toBe('July')
   })
 })

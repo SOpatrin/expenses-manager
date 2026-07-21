@@ -1,10 +1,11 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useT } from '@/app/_i18n/client'
+import { useLocale, useT } from '@/app/_i18n/client'
 import type { CategoryKey } from '@/lib/categories'
 import type { TxType } from '@/lib/currencies'
 import { filterTransactions } from '@/lib/filters'
+import { formatMonthName } from '@/lib/format'
 import { getPeriodRange, type Period } from '@/lib/periods'
 import type { Transaction } from '@/lib/transactions'
 import Analytics from './Analytics'
@@ -26,6 +27,7 @@ export default function WalletView({
   rates: Record<string, number>
 }) {
   const t = useT()
+  const { locale } = useLocale()
   const {
     optimisticTransactions,
     addState,
@@ -59,6 +61,14 @@ export default function WalletView({
     })
   }, [optimisticTransactions, period, type, category, custom])
 
+  const currentMonthTransactions = useMemo(
+    () => filterTransactions(optimisticTransactions, getPeriodRange('month')),
+    [optimisticTransactions],
+  )
+  const currentMonthLabel = t.stats.balanceForMonth(
+    formatMonthName(new Date(), locale),
+  )
+
   const renderList = (txs: Transaction[]) => (
     <TransactionList
       transactions={txs}
@@ -75,8 +85,10 @@ export default function WalletView({
   return (
     <div className="flex flex-col gap-6">
       <WalletStats
-        transactions={tab === 'analytics' ? filtered : optimisticTransactions}
+        transactions={tab === 'analytics' ? filtered : currentMonthTransactions}
         rates={rates}
+        periodLabel={tab === 'list' ? currentMonthLabel : undefined}
+        showZeroWhenEmpty={tab === 'list'}
       />
 
       <div className="flex gap-1.5">

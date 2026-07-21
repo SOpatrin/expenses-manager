@@ -63,6 +63,7 @@ export const en: Dict = {
   },
   stats: {
     balance: 'Balance',
+    balanceForMonth: (month: string) => `Balance for ${month}`,
   },
   form: {
     amount: 'Amount',

@@ -11,14 +11,18 @@ import {
 } from '@/lib/stats'
 import type { Transaction } from '@/lib/transactions'
 
+const ZERO_STATS: CurrencyStats = { income: 0, expense: 0, balance: 0 }
+
 function StatCard({
   currency,
   s,
   approximate,
+  label,
 }: {
   currency: string
   s: CurrencyStats
   approximate?: boolean
+  label?: string
 }) {
   const t = useT()
   const { locale } = useLocale()
@@ -27,7 +31,7 @@ function StatCard({
     <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
       <div className="mb-1 flex items-center justify-between">
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          {t.stats.balance}
+          {label ?? t.stats.balance}
         </p>
         <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
           {currency}
@@ -55,15 +59,19 @@ function StatCard({
 export default function WalletStats({
   transactions,
   rates,
+  periodLabel,
+  showZeroWhenEmpty,
 }: {
   transactions: Transaction[]
   rates: Record<string, number>
+  periodLabel?: string
+  showZeroWhenEmpty?: boolean
 }) {
   const t = useT()
   const [displayCurrency, setDisplayCurrency] =
     useCookieState('display-currency')
 
-  if (transactions.length === 0) return null
+  if (transactions.length === 0 && !showZeroWhenEmpty) return null
 
   const availableCurrencies = CURRENCIES.filter((c) => c in rates)
 
@@ -96,10 +104,22 @@ export default function WalletStats({
           currency={displayCurrency}
           s={computeUnifiedStats(transactions, rates, displayCurrency)}
           approximate
+          label={periodLabel}
+        />
+      ) : transactions.length === 0 ? (
+        <StatCard
+          currency={displayCurrency || CURRENCIES[0]}
+          s={ZERO_STATS}
+          label={periodLabel}
         />
       ) : (
         Object.entries(computeStats(transactions)).map(([currency, s]) => (
-          <StatCard key={currency} currency={currency} s={s} />
+          <StatCard
+            key={currency}
+            currency={currency}
+            s={s}
+            label={periodLabel}
+          />
         ))
       )}
     </div>
